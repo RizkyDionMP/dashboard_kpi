@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KPI Dashboard Mazta Farma 2025</title>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-in-out',
+            'slide-up': 'slideUp 0.6s ease-out',
+            'pulse-slow': 'pulse 3s ease-in-out infinite',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0', transform: 'translateY(10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' }
+            },
+            slideUp: {
+              '0%': { opacity: '0', transform: 'translateY(30px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
+  <div class="flex min-h-screen">
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="w-72 bg-gradient-to-b from-gray-800 via-gray-850 to-gray-900 text-white shadow-2xl flex flex-col relative">
+      <!-- Decorative gradient overlay -->
+      <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 pointer-events-none"></div>
+      
+      <!-- Logo & Title -->
+      <div class="relative flex items-center gap-4 p-6 border-b border-gray-700/50 bg-gradient-to-r from-gray-800/80 to-gray-700/80 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-lg flex items-center justify-center w-16 h-16 transform hover:scale-105 transition-transform duration-200">
+          <img src="/img/maztalogo.png" alt="Mazta Logo" class="w-14 h-14 object-contain">
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-wide text-white drop-shadow-md">
+            KPI Dashboard
+          </h1>
+          <p class="text-xs text-gray-300 mt-1">Mazta Farma 2025</p>
+        </div>
+      </div>
+
+      <!-- Navigation Menu -->
+      <nav class="relative flex-1 p-4 space-y-2">
+        <button onclick="showSection('dashboardSection')" 
+          class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-blue-600/20 hover:to-blue-500/20 transition-all duration-200 group">
+          <span class="text-2xl group-hover:scale-110 transition-transform duration-200">🏠</span>
+          <span class="text-base font-medium">Dashboard</span>
+        </button>
+
+        <button onclick="showSection('rankingSection')" 
+          class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-yellow-600/20 hover:to-yellow-500/20 transition-all duration-200 group">
+          <span class="text-2xl group-hover:scale-110 transition-transform duration-200">🏅</span>
+          <span class="text-base font-medium">Ranking</span>
+        </button>
+
+        <button onclick="showSection('indikatorPersonalSection')" 
+          class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-green-600/20 hover:to-green-500/20 transition-all duration-200 group">
+          <span class="text-2xl group-hover:scale-110 transition-transform duration-200">📌</span>
+          <span class="text-base font-medium">Indikator Personal</span>
+        </button>
+
+        <button onclick="showSection('sasaranMutuSection')" 
+          class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-purple-600/20 hover:to-purple-500/20 transition-all duration-200 group">
+          <span class="text-2xl group-hover:scale-110 transition-transform duration-200">🎯</span>
+          <span class="text-base font-medium">Sasaran Mutu</span>
+        </button>
+
+        <!-- Project with Submenu -->
+        <details class="group">
+          <summary class="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer hover:bg-gradient-to-r hover:from-orange-600/20 hover:to-orange-500/20 transition-all duration-200 list-none">
+            <span class="text-2xl group-hover:scale-110 transition-transform duration-200">🖇️</span>
+            <span class="text-base font-medium flex-1">Project</span>
+            <span class="text-sm transform group-open:rotate-180 transition-transform duration-200">▼</span>
+          </summary>
+          <div class="ml-8 mt-2 space-y-1 animate-fade-in">
+            <button onclick="showProject('kolaborasi')" 
+              class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-700/50 transition-colors text-gray-300 hover:text-white flex items-center gap-2">
+              <span class="text-lg">🤝</span> Kolaborasi
+            </button>
+            <button onclick="showProject('mandiri')" 
+              class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-700/50 transition-colors text-gray-300 hover:text-white flex items-center gap-2">
+              <span class="text-lg">👤</span> Mandiri
+            </button>
+          </div>
+        </details>
+      </nav>
+
+      <!-- Logout Button -->
+      <button onclick="logout()" 
+        class="relative m-4 px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 rounded-xl hover:from-red-700 hover:to-red-800 flex items-center justify-center gap-2 font-medium shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105">
+        <span class="text-lg">🚪</span> 
+        <span>Logout</span>
+      </button>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 overflow-auto">
+  <!-- ===== DASHBOARD SECTION ===== -->
+      <section id="dashboardSection" class="p-6 space-y-8">
+        <!-- Header -->
+        <div class="text-center py-8">
+          <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Dashboard KPI 2025
+          </h1>
+          <p class="text-gray-600 dark:text-gray-400 mt-2">Monitoring & Analytics</p>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-6 animate-slide-up">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></div>
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white">Filter Data</h2>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="space-y-2">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Department</label>
+              <select id="departmentFilter" class="w-full p-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all">
+                <option value="ALL">Semua Department</option>
+              </select>
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Bulan</label>
+              <select id="monthFilter" class="w-full p-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all">
+                <option value="">Semua Bulan</option>
+              </select>
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Karyawan</label>
+              <select id="employeeFilter" class="w-full p-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all">
+                <option value="">Semua Karyawan</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Performance Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl p-6 shadow-xl text-white transform hover:scale-105 transition-all duration-200">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-lg font-medium opacity-90">Top Performer</h3>
+                <p id="topPerformer" class="text-3xl font-bold mt-2">-</p>
+              </div>
+              <div class="text-5xl opacity-80">🏆</div>
+            </div>
+          </div>
+          
+          <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-2xl p-6 shadow-xl text-white transform hover:scale-105 transition-all duration-200">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-lg font-medium opacity-90">Under Performer</h3>
+                <p id="underPerformer" class="text-3xl font-bold mt-2">-</p>
+              </div>
+              <div class="text-5xl opacity-80">📉</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-200/50 dark:border-gray-700/50">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Karyawan</h3>
+                <p id="totalKaryawan" class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">0</p>
+              </div>
+              <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+                <span class="text-2xl">👥</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-200/50 dark:border-gray-700/50">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Rata-rata KPI</h3>
+                <p id="rataRataKpi" class="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">0%</p>
+              </div>
+              <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
+                <span class="text-2xl">📊</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-200/50 dark:border-gray-700/50">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">KPI ≥ 90%</h3>
+                <p id="jumlah90Up" class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">0</p>
+              </div>
+              <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
+                <span class="text-2xl">✅</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-200/50 dark:border-gray-700/50">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">KPI < 70%</h3>
+                <p id="jumlahUnderTarget" class="text-2xl font-bold text-yellow-600 dark:text-yellow-400 mt-1">0</p>
+              </div>
+              <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl flex items-center justify-center">
+                <span class="text-2xl">⚠️</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200/50 dark:border-gray-700/50">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+              <span class="text-2xl">📊</span> Workload
+            </h3>
+            <canvas id="workloadChart" height="300"></canvas>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200/50 dark:border-gray-700/50">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+              <span class="text-2xl">📈</span> Rata-Rata Workload per Unit
+            </h3>
+            <canvas id="avgDeptBarChart" height="300"></canvas>
+          </div>
+        </div>
+      </section>
+
+<!-- ===== RANKING SECTION ===== -->
+<section id="rankingSection" class="hidden p-6 space-y-8">
+  <div class="text-center py-8">
+    <h1 class="text-4xl font-bold bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
+      Ranking KPI
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400 mt-2">Performance Leaderboard</p>
+  </div>
+
+  <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Ranking Departemen -->
+      <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-700 rounded-xl p-5 border border-blue-200 dark:border-gray-600">
+        <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+          <span class="text-2xl">🏢</span> Ranking Departemen
+        </h3>
+        <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm">
+          <table class="w-full text-sm">
+            <thead class="bg-blue-600 text-white">
+              <tr>
+                <th class="px-4 py-3 text-left">Dept</th>
+                <th class="px-4 py-3 text-center">Rata-rata</th>
+                <th class="px-4 py-3 text-center">Rank</th>
+              </tr>
+            </thead>
+            <tbody id="rankingDeptTableBody" class="divide-y divide-gray-200 dark:divide-gray-700">
+              <!-- Data via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Ranking Karyawan -->
+      <div class="lg:col-span-2 bg-gradient-to-br from-green-50 to-green-100 dark:from-gray-800 dark:to-gray-700 rounded-xl p-5 border border-green-200 dark:border-gray-600">
+        <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+          <span class="text-2xl">👤</span> Ranking Karyawan
+        </h3>
+        <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm max-h-80 overflow-y-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-green-600 text-white sticky top-0">
+              <tr>
+                <th class="px-4 py-3 text-center">Rank</th>
+                <th class="px-4 py-3 text-left">Nama</th>
+                <th class="px-4 py-3 text-center">Dept</th>
+                <th class="px-4 py-3 text-center">Rata-rata</th>
+              </tr>
+            </thead>
+            <tbody id="rankingEmployeeTableBody" class="divide-y divide-gray-200 dark:divide-gray-700">
+              <!-- Data via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Department Summary Section -->
+  <div id="deptSummarySection" class="hidden">
+    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl p-6">
+      <h2 id="deptTitle" class="text-2xl font-bold text-center mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+        Summary Departemen
+      </h2>
+
+      <!-- Nilai KPI Head + Grade Display -->
+      <div class="text-center mb-8">
+        <!-- Box Nilai KPI Head -->
+        <div class="inline-block bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl p-6 shadow-xl mb-6">
+          <h4 class="text-white font-semibold mb-2">Nilai KPI Head</h4>
+          <p id="nilaiKpiHead" class="text-4xl font-bold text-white">0.00</p>
+        </div>
+
+        <!-- Grade Display (akan diisi oleh JS) -->
+        <div id="gradeDisplay" class="mt-6">
+          <!-- Grade info will be rendered here by JS -->
+        </div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div id="summaryContainer" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+        <!-- Cards will be rendered by JS -->
+      </div>
+
+      <!-- Back Button -->
+      <div class="text-center">
+        <button id="backToRanking" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
+          <i class="fas fa-arrow-left mr-2"></i> Kembali ke Ranking
+        </button>
+      </div>
+    </div>
+
+    <!-- Line Chart -->
+    <div class="mt-8 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-gray-800 dark:to-gray-700 rounded-xl p-6 border border-purple-200 dark:border-gray-600">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+          <span class="text-2xl">📈</span> Trend KPI Personal
+        </h3>
+        <span class="text-sm text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 px-3 py-1 rounded-full">
+          2025
+        </span>
+      </div>
+      <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+        <canvas id="kpiPersonalLineChart" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+   <!-- Tambahkan di <head> -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- ===== INDIKATOR PERSONAL SECTION ===== -->
+<section id="indikatorPersonalSection" class="hidden p-6 space-y-8">
+  <div class="text-center py-8">
+    <h1 class="text-4xl font-bold bg-gradient-to-r from-green-500 to-teal-500 bg-clip-text text-transparent">
+      Indikator Personal
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400 mt-2">Personal KPI Indicators</p>
+  </div>
+
+  <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-6">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-1 h-6 bg-gradient-to-b from-green-500 to-teal-500 rounded-full"></div>
+      <h2 class="text-xl font-bold text-gray-800 dark:text-white">Filter Indikator</h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <select id="filterDept" class="p-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500">
+        <option value="ALL">Semua Departemen</option>
+      </select>
+      <select id="filterMonth" class="p-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500">
+        <option value="ALL">Semua Bulan</option>
+      </select>
+      <select id="filterStatus" class="p-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500">
+        <option value="ALL">Semua Status</option>
+        <option value="Under">Under</option>
+        <option value="Within">Within</option>
+        <option value="Upper">Upper</option>
+      </select>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm max-h-96 overflow-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-gradient-to-r from-green-600 to-teal-600 text-white sticky top-0">
+          <tr>
+            <th class="px-4 py-3 text-center">Personil</th>
+            <th class="px-4 py-3 text-center">Indikator</th>
+            <th class="px-4 py-3 text-center">Dept</th>
+            <th class="px-4 py-3 text-center">Bulan</th>
+            <th class="px-4 py-3 text-center">Bobot</th>
+            <th class="px-4 py-3 text-center">Total Task WL</th>
+            <th class="px-4 py-3 text-center">Project</th>
+            <th class="px-4 py-3 text-center">Administrasi</th>
+            <th class="px-4 py-3 text-center">Umum</th>
+            <th class="px-4 py-3 text-center">Target</th>
+            <th class="px-4 py-3 text-center">% Ach</th>
+            <th class="px-4 py-3 text-center">Nilai Indikator</th>
+            <th class="px-4 py-3 text-center">Nilai KPI</th>
+            <th class="px-4 py-3 text-center">💬</th>
+          </tr>
+        </thead>
+        <tbody id="indikatorPersonalTableBody" class="divide-y divide-gray-200 dark:divide-gray-700">
+          <tr>
+            <td colspan="14" class="text-center py-4 text-gray-500 text-lg">
+              Tidak ada data indikator personal
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- Comments Modal -->
+<div id="komentarModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+  <div class="bg-white dark:bg-gray-800 w-full max-w-2xl rounded-2xl shadow-2xl relative max-h-[90vh] overflow-hidden">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
+      <div class="flex justify-between items-center">
+        <h2 class="text-xl font-bold flex items-center gap-2">
+          <i class="fas fa-comments"></i> KPI Comments
+        </h2>
+        <button type="button" onclick="closeKomentarModal()" 
+          class="flex items-center gap-2 px-3 py-1 bg-red-500 hover:bg-red-600 rounded-lg text-white text-sm font-semibold transition">
+          <i class="fas fa-times"></i> <span>Close</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="p-6 max-h-96 overflow-y-auto custom-scrollbar">
+      <!-- Comments Table -->
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Previous Comments</h3>
+        <div class="overflow-x-auto">
+          <table class="min-w-full border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <thead class="bg-gray-100 dark:bg-gray-700">
+              <tr>
+                <th class="px-4 py-3 border-r border-gray-200 dark:border-gray-600 text-center w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">Author</th>
+                <th class="px-4 py-3 border-r border-gray-200 dark:border-gray-600 text-center w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">Date</th>
+                <th class="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300">Comment</th>
+              </tr>
+            </thead>
+            <tbody id="komentarTableBody" class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
+              <!-- Comments will be populated here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Add New Comment -->
+      <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Add New Comment</h3>
+        <div class="flex items-center gap-3">
+          <input id="komentarInput" type="text" placeholder="Write your comment..." 
+            class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+          <button onclick="saveKomentar()" 
+            class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200">
+            <i class="fas fa-paper-plane mr-2"></i>Send
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Notification Toast -->
+<div id="komentarNotif" class="hidden fixed top-5 right-5 z-50 max-w-sm bg-white dark:bg-gray-800 border-l-4 border-blue-600 shadow-2xl rounded-lg p-4 text-gray-800 dark:text-white transform transition-all duration-300">
+  <div class="flex items-start gap-3">
+    <div class="flex-shrink-0">
+      <i class="fas fa-bell text-blue-600 text-lg"></i>
+    </div>
+    <div class="flex-1">
+      <h3 id="notifTitle" class="text-base font-semibold mb-1">Comment Notification</h3>
+      <p id="notifBody" class="text-sm leading-relaxed text-gray-600 dark:text-gray-300"></p>
+    </div>
+    <button onclick="closeNotification()" class="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+</div>
+
+      <!-- ===== MAIN CONTENT ===== -->
+<main class="flex-1 overflow-auto custom-scrollbar">
+
+  <!-- ===== SASARAN MUTU SECTION ===== -->
+  <section id="sasaranMutuSection" class="hidden p-6 space-y-8">
+    <!-- Header with Breadcrumb -->
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <nav class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+          <span>Home</span> <i class="fas fa-chevron-right mx-2"></i> <span class="text-purple-600 dark:text-purple-400">Sasaran Mutu</span>
+        </nav>
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent animate-pulse-slow">
+          Sasaran Mutu
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-2">Quality Objectives Management & Monitoring</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <button onclick="refreshSasaranMutu()" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2">
+          <i class="fas fa-sync-alt"></i>
+          <span>Refresh</span>
+        </button>
+        <button onclick="generateSarmutReport()" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2">
+          <i class="fas fa-file-pdf"></i>
+          <span>Generate Report</span>
+        </button>
+        <button onclick="exportSarmutData()" class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2">
+          <i class="fas fa-download"></i>
+          <span>Export Data</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Alert Notifications -->
+    <div id="sarmutAlertContainer" class="space-y-2"></div>
+
+    <!-- Summary Dashboard Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div onclick="filterSasaranMutu('ALL')" 
+        class="cursor-pointer bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+        <div class="relative z-10">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <i class="fas fa-bullseye text-2xl"></i>
+            </div>
+            <div class="text-right">
+              <div class="text-xs opacity-80">Total</div>
+            </div>
+          </div>
+          <p class="font-medium text-blue-100">Total Objectives</p>
+          <p id="sarmutTotal" class="text-3xl font-bold mt-2">0</p>
+        </div>
+      </div>
+
+      <div onclick="filterSasaranMutu('ACHIEVED')" 
+        class="cursor-pointer bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+        <div class="relative z-10">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <i class="fas fa-check-circle text-2xl"></i>
+            </div>
+            <div class="text-right">
+              <div class="text-xs opacity-80">Success</div>
+            </div>
+          </div>
+          <p class="font-medium text-green-100">Achieved</p>
+          <p id="sarmutAchieved" class="text-3xl font-bold mt-2">0</p>
+          <div class="mt-2 text-xs opacity-80">
+            <span id="sarmutAchievedPercent">0%</span> success rate
+          </div>
+        </div>
+      </div>
+
+      <div onclick="filterSasaranMutu('NOT_ACHIEVED')" 
+        class="cursor-pointer bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+        <div class="relative z-10">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <i class="fas fa-exclamation-circle text-2xl"></i>
+            </div>
+            <div class="text-right">
+              <div class="text-xs opacity-80">Alert</div>
+            </div>
+          </div>
+          <p class="font-medium text-red-100">Not Achieved</p>
+          <p id="sarmutNotAchieved" class="text-3xl font-bold mt-2">0</p>
+          <div class="mt-2 text-xs opacity-80">
+            Needs attention
+          </div>
+        </div>
+      </div>
+
+      <!-- Department Filter -->
+      <div class="glassmorphism rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 group border border-gray-200/50 dark:border-gray-700/50">
+        <div class="flex items-center justify-between">
+          <div class="flex-1">
+            <label for="filterDeptSarmut" class="block font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+              <i class="fas fa-filter text-purple-500"></i>Filter Department
+            </label>
+            <select id="filterDeptSarmut" class="w-full bg-white/90 dark:bg-gray-700/90 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 backdrop-blur-sm">
+              <option value="ALL">All Departments</option>
+            </select>
+          </div>
+          <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform ml-4">
+            <i class="fas fa-filter text-2xl text-purple-600 dark:text-purple-400"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Data Table -->
+    <div class="glassmorphism rounded-2xl shadow-xl overflow-hidden border border-gray-200/50 dark:border-gray-700/50 mb-8">
+      <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 flex items-center justify-between">
+        <h2 class="text-xl font-bold flex items-center gap-2">
+          <i class="fas fa-table"></i> Sasaran Mutu Data Table
+        </h2>
+        <button onclick="toggleTable('sasaranMutuTableContent', this)" 
+                class="text-sm bg-white/20 px-3 py-1 rounded-lg hover:bg-white/30 transition-colors">
+          <i class="fas fa-plus-square mr-1"></i>
+          <span>Show</span>
+        </button>
+      </div>
+
+      <div id="sasaranMutuTableContent" class="hidden bg-white dark:bg-gray-900 max-h-[600px] overflow-auto custom-scrollbar">
+        <table id="sasaranMutuTable" class="w-full border-collapse text-sm">
+          <thead class="bg-gray-800 text-white sticky top-0">
+            <tr>
+              <th class="border border-gray-400 px-3 py-3 text-center">No</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Criteria</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Quality Objective</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Department</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Calculation Method</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Month</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Work Program</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Evaluation Period</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Achievement</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody id="sasaranMutuBody" class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white text-center divide-y divide-gray-200 dark:divide-gray-700">
+            <!-- Data dari JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Summary Data Table -->
+    <div class="glassmorphism rounded-2xl shadow-xl overflow-hidden border border-gray-200/50 dark:border-gray-700/50">
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 flex items-center justify-between">
+        <h2 class="text-xl font-bold flex items-center gap-2">
+          <i class="fas fa-table"></i> Sasaran Mutu Summary (sarmutindikator)
+        </h2>
+        <button onclick="toggleTable('sasaranMutuSummaryContent', this)" 
+                class="text-sm bg-white/20 px-3 py-1 rounded-lg hover:bg-white/30 transition-colors">
+          <i class="fas fa-plus-square mr-1"></i>
+          <span>Show</span>
+        </button>
+      </div>
+
+      <div id="sasaranMutuSummaryContent" class="hidden bg-white dark:bg-gray-900 max-h-[600px] overflow-auto custom-scrollbar">
+        <table id="sasaranMutuSummaryTable" class="w-full border-collapse text-sm">
+          <thead class="bg-gray-800 text-white sticky top-0">
+            <tr>
+              <th class="border border-gray-400 px-3 py-3 text-center">No</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Sasaran Mutu</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Dept</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Periode Evaluasi</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Kategori</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Jan</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Feb</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Mar</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Apr</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">May</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Jun</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Jul</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Aug</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Sep</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Oct</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Nov</th>
+              <th class="border border-gray-400 px-3 py-3 text-center">Dec</th>
+            </tr>
+          </thead>
+          <tbody id="sasaranMutuSummaryBody" class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white text-center divide-y divide-gray-200 dark:divide-gray-700">
+            <!-- Data dari JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Analytics Charts - HIDDEN BY DEFAULT, ONLY SHOWN FOR MKT -->
+    <div id="sarmutCharts" class="hidden space-y-6">
+      <!-- Target vs Realization Chart -->
+      <div class="glassmorphism rounded-2xl p-6 shadow-lg border border-gray-200/50 dark:border-gray-700/50">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+            <i class="fas fa-chart-line text-blue-500"></i> Target vs Realization Trend
+          </h3>
+          <div class="flex items-center gap-3">
+            <label for="produkSelect" class="text-sm font-medium text-gray-700 dark:text-gray-300">Product:</label>
+            <select id="produkSelect" class="p-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+              <!-- Options will be populated by JavaScript -->
+            </select>
+            <button onclick="refreshChart('target')" class="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+              <i class="fas fa-sync-alt mr-1"></i>Refresh
+            </button>
+          </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-4 aspect-[16/6]">
+          <canvas id="chartSarmutLine" class="w-full h-full"></canvas>
+        </div>
+      </div>
+
+      <!-- Achievement Percentage Chart -->
+      <div class="glassmorphism rounded-2xl p-6 shadow-lg border border-gray-200/50 dark:border-gray-700/50">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+            <i class="fas fa-percentage text-green-500"></i> Achievement Percentage by Month
+          </h3>
+          <div class="flex items-center gap-2">
+            <button onclick="toggleChartView('percent')" class="text-sm text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 transition-colors">
+              <i class="fas fa-expand-alt mr-1"></i>Fullscreen
+            </button>
+            <button onclick="exportChartData('percent')" class="text-sm text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 transition-colors">
+              <i class="fas fa-download mr-1"></i>Export
+            </button>
+          </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-4 aspect-[16/5]">
+          <canvas id="chartSarmutPercent" class="w-full h-full"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Indicator Charts Section -->
+    <div id="sarmutIndikatorCharts" class="hidden space-y-6">
+      <!-- Indicator Target vs Realization -->
+      <div class="glassmorphism rounded-2xl p-6 shadow-lg border border-gray-200/50 dark:border-gray-700/50">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+            <i class="fas fa-chart-area text-purple-500"></i> Indicator Performance Analysis
+          </h3>
+          <div class="flex items-center gap-3">
+            <label for="indikatorSelect" class="text-sm font-medium text-gray-700 dark:text-gray-300">Indicator:</label>
+            <select id="indikatorSelect" class="p-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-purple-500">
+              <!-- Options will be populated by JavaScript -->
+            </select>
+            <button onclick="refreshChart('indicator')" class="text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors">
+              <i class="fas fa-sync-alt mr-1"></i>Refresh
+            </button>
+          </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-4 aspect-[16/5]">
+          <canvas id="chartIndikatorLine" class="w-full h-full"></canvas>
+        </div>
+      </div>
+
+      <!-- Indicator Achievement Percentage -->
+      <div class="glassmorphism rounded-2xl p-6 shadow-lg border border-gray-200/50 dark:border-gray-700/50">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+            <i class="fas fa-chart-pie text-orange-500"></i> Indicator Achievement Distribution
+          </h3>
+          <div class="flex items-center gap-2">
+            <button onclick="downloadChartData('indicator')" class="text-sm text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 transition-colors">
+              <i class="fas fa-download mr-1"></i>Export Data
+            </button>
+            <button onclick="printChart('indicator')" class="text-sm text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 transition-colors">
+              <i class="fas fa-print mr-1"></i>Print
+            </button>
+          </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-4 aspect-[16/5]">
+          <canvas id="chartIndikatorPercent" class="w-full h-full"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============================= -->
+<!-- 📂 PROJECT SECTION (SUMMARY SAJA) -->
+<!-- ============================= -->
+<section id="projectSection" class="hidden p-6 space-y-8">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <nav class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+        <span>Home</span> <i class="fas fa-chevron-right mx-2"></i>
+        <span class="text-purple-600 dark:text-purple-400">Projects</span>
+      </nav>
+      <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+        Projects
+      </h1>
+      <p class="text-gray-600 dark:text-gray-400 mt-2">Monitoring Project Kolaborasi & Mandiri</p>
+    </div>
+    <div class="flex items-center gap-4">
+      <button onclick="refreshProjects()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+        <i class="fas fa-sync-alt mr-2"></i>Refresh
+      </button>
+      <button onclick="exportProjectData()" class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors">
+        <i class="fas fa-download mr-2"></i>Export
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 Summary Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="bg-blue-600 rounded-xl shadow-lg p-6 text-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold">Total Projects</h2>
+          <p id="totalProject" class="text-3xl font-bold mt-4">0</p>
+          <p class="text-sm mt-1 opacity-80">All projects</p>
+        </div>
+        <i class="fas fa-project-diagram text-4xl opacity-20"></i>
+      </div>
+    </div>
+    <div class="bg-green-600 rounded-xl shadow-lg p-6 text-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold">Done</h2>
+          <p id="doneProject" class="text-3xl font-bold mt-4">0</p>
+          <p class="text-sm mt-1 opacity-80">Completed</p>
+        </div>
+        <i class="fas fa-check-circle text-4xl opacity-20"></i>
+      </div>
+    </div>
+    <div class="bg-red-600 rounded-xl shadow-lg p-6 text-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold">Overdue</h2>
+          <p id="overdueProject" class="text-3xl font-bold mt-4">0</p>
+          <p class="text-sm mt-1 opacity-80">Late projects</p>
+        </div>
+        <i class="fas fa-exclamation-triangle text-4xl opacity-20"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔽 Filter Dept -->
+<div class="flex justify-end mt-6">
+  <div>
+    <label for="filterDeptProject" 
+           class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+      Filter Department
+    </label>
+    <select id="filterDeptProject"
+            onchange="filterProjectsByDepartment(this.value)"
+            class="mt-1 block w-56 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+      <!-- opsi diisi otomatis dari spreadsheet -->
+      <option value="ALL">Semua Departemen</option>
+    </select>
+  </div>
+</div>
+
+  <!-- Navigation to specific project types -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+  <div id="kolaborasiProjectCard" 
+       class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl shadow-lg p-6 text-white cursor-pointer hover:scale-105 transition-transform"
+       data-project-type="kolaborasi">
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="text-xl font-bold">Project Kolaborasi</h3>
+        <p class="opacity-80 mt-2">View collaborative projects</p>
+      </div>
+      <i class="fas fa-users text-3xl opacity-30"></i>
+    </div>
+  </div>
+  <div id="mandiriProjectCard" 
+       class="bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl shadow-lg p-6 text-white cursor-pointer hover:scale-105 transition-transform"
+       data-project-type="mandiri">
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="text-xl font-bold">Project Mandiri</h3>
+        <p class="opacity-80 mt-2">View independent projects</p>
+      </div>
+      <i class="fas fa-user text-3xl opacity-30"></i>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============================= -->
+<!-- 📂 PROJECT KOLABORASI (Enhanced) -->
+<!-- ============================= -->
+<section id="projectKolaborasiSection" class="hidden p-6 space-y-8">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-purple-600">Project Kolaborasi</h1>
+      <p class="text-gray-600 dark:text-gray-400 mt-2">Monitoring collaborative projects across departments</p>
+    </div>
+    <div class="flex gap-3">
+      <button onclick="fetchProjectKolaborasi()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+        <i class="fas fa-sync-alt mr-2"></i>Refresh
+      </button>
+      <button onclick="exportProjectData()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+        <i class="fas fa-download mr-2"></i>Export
+      </button>
+    </div>
+  </div>
+
+  <!-- Enhanced Summary Cards with Click Filtering -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div onclick="filterKolaborasiByStatus('ALL')" 
+         class="summary-card bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white cursor-pointer hover:scale-105 transition-transform relative"
+         id="kolaborasiAllCard">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold">Total Projects</h2>
+          <p id="kolaborasiTotalProject" class="text-3xl font-bold mt-4">0</p>
+          <p class="text-sm mt-1 opacity-80">All projects</p>
+        </div>
+        <i class="fas fa-project-diagram text-4xl opacity-20"></i>
+      </div>
+      <div id="kolaborasiAllFilter" class="filter-indicator hidden">
+        <i class="fas fa-filter text-xs"></i>
+      </div>
+    </div>
+    
+    <div onclick="filterKolaborasiByStatus('done')" 
+         class="summary-card bg-green-600 rounded-xl shadow-lg p-6 text-white cursor-pointer hover:scale-105 transition-transform relative"
+         id="kolaborasiDoneCard">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold">Done</h2>
+          <p id="kolaborasiDoneProject" class="text-3xl font-bold mt-4">0</p>
+          <p class="text-sm mt-1 opacity-80">Completed</p>
+        </div>
+        <i class="fas fa-check-circle text-4xl opacity-20"></i>
+      </div>
+      <div id="kolaborasiDoneFilter" class="filter-indicator hidden">
+        <i class="fas fa-filter text-xs"></i>
+      </div>
+    </div>
+    
+    <div onclick="filterKolaborasiByStatus('on progress')" 
+         class="summary-card bg-blue-600 rounded-xl shadow-lg p-6 text-white cursor-pointer hover:scale-105 transition-transform relative"
+         id="kolaborasiProgressCard">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold">On Progress</h2>
+          <p id="kolaborasiProgressProject" class="text-3xl font-bold mt-4">0</p>
+          <p class="text-sm mt-1 opacity-80">In progress</p>
+        </div>
+        <i class="fas fa-clock text-4xl opacity-20"></i>
+      </div>
+      <div id="kolaborasiProgressFilter" class="filter-indicator hidden">
+        <i class="fas fa-filter text-xs"></i>
+      </div>
+    </div>
+    
+    <div onclick="filterKolaborasiByStatus('overdue')" 
+         class="summary-card bg-red-600 rounded-xl shadow-lg p-6 text-white cursor-pointer hover:scale-105 transition-transform relative"
+         id="kolaborasiOverdueCard">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold">Overdue</h2>
+          <p id="kolaborasiOverdueProject" class="text-3xl font-bold mt-4">0</p>
+          <p class="text-sm mt-1 opacity-80">Late projects</p>
+        </div>
+        <i class="fas fa-exclamation-triangle text-4xl opacity-20"></i>
+      </div>
+      <div id="kolaborasiOverdueFilter" class="filter-indicator hidden">
+        <i class="fas fa-filter text-xs"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Department Filter -->
+  <div class="flex justify-end mb-6">
+    <div>
+      <label for="filterDeptKolaborasi" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        Filter Department
+      </label>
+      <select id="filterDeptKolaborasi"
+              onchange="filterKolaborasiByDepartment(this.value)"
+              class="mt-1 block w-56 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+        <option value="ALL">Semua Departemen</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 🔽 Summary Table -->
+  <div class="glassmorphism rounded-2xl shadow-xl overflow-hidden border border-gray-200/50 dark:border-gray-700/50 mb-8">
+    <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 flex items-center justify-between">
+      <h2 class="text-xl font-bold flex items-center gap-2">
+        <i class="fas fa-chart-bar"></i> Project Kolaborasi Summary
+      </h2>
+      <button onclick="toggleTable('projectKolaborasiSummaryTableBody', this)" 
+              class="text-sm bg-white/20 px-3 py-1 rounded-lg hover:bg-white/30 transition-colors">
+        <i class="fas fa-chevron-up mr-1"></i>
+        <span>Hide</span>
+      </button>
+    </div>
+    <div id="projectKolaborasiSummaryTableBody" class="bg-white dark:bg-gray-900 max-h-[600px] overflow-auto">
+      <table class="w-full border-collapse text-sm">
+        <thead class="bg-gray-800 text-white sticky top-0">
+          <tr>
+            <th class="border border-gray-400 px-3 py-3 text-center">No</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">Department</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">Done</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">On Progress</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">Over Due</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">Achievement</th>
+          </tr>
+        </thead>
+        <tbody id="projectKolaborasiTableBody" 
+               class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white text-center divide-y divide-gray-200 dark:divide-gray-700">
+          <tr>
+            <td colspan="6" class="py-8 text-gray-500">
+              <i class="fas fa-spinner fa-spin mr-2"></i>Loading data...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 🔽 Detail Table -->
+  <div class="glassmorphism rounded-2xl shadow-xl overflow-hidden border border-gray-200/50 dark:border-gray-700/50">
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 flex items-center justify-between">
+      <h2 class="text-xl font-bold flex items-center gap-2">
+        <i class="fas fa-list-alt"></i> Project Kolaborasi Detail
+        <span id="kolaborasiFilterInfo" class="text-sm bg-white/20 px-2 py-1 rounded ml-2 hidden"></span>
+      </h2>
+      <button onclick="toggleTable('projectKolaborasiDetailContent', this)" 
+              class="text-sm bg-white/20 px-3 py-1 rounded-lg hover:bg-white/30 transition-colors">
+        <i class="fas fa-chevron-up mr-1"></i>
+        <span>Hide</span>
+      </button>
+    </div>
+    <div id="projectKolaborasiDetailContent" class="bg-white dark:bg-gray-900 max-h-[600px] overflow-auto">
+      <table class="w-full border-collapse text-sm">
+        <thead class="bg-gray-800 text-white sticky top-0">
+          <tr>
+            <th class="border border-gray-400 px-3 py-3 text-center">No</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">Nama Project</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">Tanggal Start</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">Detail Task</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">Department</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">Status</th>
+          </tr>
+        </thead>
+        <tbody id="projectKolaborasiBodyTable" 
+               class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white text-center divide-y divide-gray-200 dark:divide-gray-700">
+          <tr>
+            <td colspan="6" class="py-8 text-gray-500">
+              <i class="fas fa-spinner fa-spin mr-2"></i>Loading data...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- 📂 PROJECT MANDIRI (Enhanced) -->
+<!-- ============================= -->
+<section id="projectMandiriSection" class="hidden p-6 space-y-8">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-green-600">Project Mandiri</h1>
+      <p class="text-gray-600 dark:text-gray-400 mt-2">Monitoring independent projects across departments</p>
+    </div>
+    <div class="flex gap-3">
+      <button onclick="fetchProjectMandiri()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+        <i class="fas fa-sync-alt mr-2"></i>Refresh
+      </button>
+      <button onclick="exportProjectData()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+        <i class="fas fa-download mr-2"></i>Export
+      </button>
+    </div>
+  </div>
+
+  <!-- Enhanced Summary Cards with Click Filtering -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div onclick="filterMandiriByStatus('ALL')" 
+         class="summary-card bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white cursor-pointer hover:scale-105 transition-transform relative"
+         id="mandiriAllCard">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold">Total Projects</h2>
+          <p id="mandiriTotalProject" class="text-3xl font-bold mt-4">0</p>
+          <p class="text-sm mt-1 opacity-80">All projects</p>
+        </div>
+        <i class="fas fa-project-diagram text-4xl opacity-20"></i>
+      </div>
+      <div id="mandiriAllFilter" class="filter-indicator hidden">
+        <i class="fas fa-filter text-xs"></i>
+      </div>
+    </div>
+    
+    <div onclick="filterMandiriByStatus('done')" 
+         class="summary-card bg-green-600 rounded-xl shadow-lg p-6 text-white cursor-pointer hover:scale-105 transition-transform relative"
+         id="mandiriDoneCard">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold">Done</h2>
+          <p id="mandiriDoneProject" class="text-3xl font-bold mt-4">0</p>
+          <p class="text-sm mt-1 opacity-80">Completed</p>
+        </div>
+        <i class="fas fa-check-circle text-4xl opacity-20"></i>
+      </div>
+      <div id="mandiriDoneFilter" class="filter-indicator hidden">
+        <i class="fas fa-filter text-xs"></i>
+      </div>
+    </div>
+    
+    <div onclick="filterMandiriByStatus('on progress')" 
+         class="summary-card bg-blue-600 rounded-xl shadow-lg p-6 text-white cursor-pointer hover:scale-105 transition-transform relative"
+         id="mandiriProgressCard">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold">On Progress</h2>
+          <p id="mandiriProgressProject" class="text-3xl font-bold mt-4">0</p>
+          <p class="text-sm mt-1 opacity-80">In progress</p>
+        </div>
+        <i class="fas fa-clock text-4xl opacity-20"></i>
+      </div>
+      <div id="mandiriProgressFilter" class="filter-indicator hidden">
+        <i class="fas fa-filter text-xs"></i>
+      </div>
+    </div>
+    
+    <div onclick="filterMandiriByStatus('overdue')" 
+         class="summary-card bg-red-600 rounded-xl shadow-lg p-6 text-white cursor-pointer hover:scale-105 transition-transform relative"
+         id="mandiriOverdueCard">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold">Overdue</h2>
+          <p id="mandiriOverdueProject" class="text-3xl font-bold mt-4">0</p>
+          <p class="text-sm mt-1 opacity-80">Late projects</p>
+        </div>
+        <i class="fas fa-exclamation-triangle text-4xl opacity-20"></i>
+      </div>
+      <div id="mandiriOverdueFilter" class="filter-indicator hidden">
+        <i class="fas fa-filter text-xs"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Department Filter -->
+  <div class="flex justify-end mb-6">
+    <div>
+      <label for="filterDeptMandiri" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        Filter Department
+      </label>
+      <select id="filterDeptMandiri"
+              onchange="filterMandiriByDepartment(this.value)"
+              class="mt-1 block w-56 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-green-500">
+        <option value="ALL">Semua Departemen</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 🔽 Summary Table -->
+  <div class="glassmorphism rounded-2xl shadow-xl overflow-hidden border border-gray-200/50 dark:border-gray-700/50 mb-8">
+    <div class="bg-gradient-to-r from-green-600 to-emerald-600 text-white p-4 flex items-center justify-between">
+      <h2 class="text-xl font-bold flex items-center gap-2">
+        <i class="fas fa-chart-bar"></i> Project Mandiri Summary
+      </h2>
+      <button onclick="toggleTable('projectMandiriSummaryTableBody', this)" 
+              class="text-sm bg-white/20 px-3 py-1 rounded-lg hover:bg-white/30 transition-colors">
+        <i class="fas fa-chevron-up mr-1"></i>
+        <span>Hide</span>
+      </button>
+    </div>
+    <div id="projectMandiriSummaryTableBody" class="bg-white dark:bg-gray-900 max-h-[600px] overflow-auto">
+      <table class="w-full border-collapse text-sm">
+        <thead class="bg-gray-800 text-white sticky top-0">
+          <tr>
+            <th class="border border-gray-400 px-3 py-3 text-center">No</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">Department</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">Done</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">On Progress</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">Over Due</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">Achievement</th>
+          </tr>
+        </thead>
+        <tbody id="projectMandiriTableBody" 
+               class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white text-center divide-y divide-gray-200 dark:divide-gray-700">
+          <tr>
+            <td colspan="6" class="py-8 text-gray-500">
+              <i class="fas fa-spinner fa-spin mr-2"></i>Loading data...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 🔽 Detail Table -->
+  <div class="glassmorphism rounded-2xl shadow-xl overflow-hidden border border-gray-200/50 dark:border-gray-700/50">
+    <div class="bg-gradient-to-r from-red-600 to-pink-600 text-white p-4 flex items-center justify-between">
+      <h2 class="text-xl font-bold flex items-center gap-2">
+        <i class="fas fa-list-alt"></i> Project Mandiri Detail
+        <span id="mandiriFilterInfo" class="text-sm bg-white/20 px-2 py-1 rounded ml-2 hidden"></span>
+      </h2>
+      <button onclick="toggleTable('projectMandiriDetailContent', this)" 
+              class="text-sm bg-white/20 px-3 py-1 rounded-lg hover:bg-white/30 transition-colors">
+        <i class="fas fa-chevron-up mr-1"></i>
+        <span>Hide</span>
+      </button>
+    </div>
+    <div id="projectMandiriDetailContent" class="bg-white dark:bg-gray-900 max-h-[600px] overflow-auto">
+      <table class="w-full border-collapse text-sm">
+        <thead class="bg-gray-800 text-white sticky top-0">
+          <tr>
+            <th class="border border-gray-400 px-3 py-3 text-center">No</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">Nama Project</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">Tanggal Start</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">Detail Task</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">Department</th>
+            <th class="border border-gray-400 px-3 py-3 text-center">Status</th>
+          </tr>
+        </thead>
+        <tbody id="projectMandiriBodyTable" 
+               class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white text-center divide-y divide-gray-200 dark:divide-gray-700">
+          <tr>
+            <td colspan="6" class="py-8 text-gray-500">
+              <i class="fas fa-spinner fa-spin mr-2"></i>Loading data...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+  <!-- Footer -->
+      <footer class="mt-12 py-6 text-center text-gray-500 dark:text-gray-400 border-t border-gray-300 dark:border-gray-700">
+        <div class="flex items-center justify-center gap-2 mb-2">
+          <i class="fas fa-heart text-red-500"></i>
+          <span>&copy; 2025 Mazta Farma — Built with care for better performance</span>
+        </div>
+        <p class="text-sm">All rights reserved. Mazta group</p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Script akses departemen & logout -->
+  <script src="script.js"></script>
+  <script>
+   
+    // ===== Registrasi plugin Chart.js =====
+   if (window.Chart && window.ChartDataLabels) Chart.register(ChartDataLabels);
+
+    function showSection(sectionId) {
+      const sections = document.querySelectorAll('main > section');
+
+      sections.forEach(sec => {
+        if (sec.id === sectionId) {
+          sec.style.display = 'block';
+          sec.style.opacity = 0;
+          let op = 0;
+          const fadeIn = setInterval(() => {
+            op += 0.1;
+            sec.style.opacity = op;
+            if (op >= 1) clearInterval(fadeIn);
+          }, 40);
+        } else {
+          if (sec.style.display !== 'none') {
+            let op = 1;
+            const fadeOut = setInterval(() => {
+              op -= 0.1;
+              sec.style.opacity = op;
+              if (op <= 0) {
+                clearInterval(fadeOut);
+                sec.style.display = 'none';
+              }
+            }, 40);
+          }
+        }
+      });
+    }
+
+    // Inisialisasi & cek login
+    (function () {
+      window.userDepartment = 'ALL';
+
+      fetch('/user-info', { credentials: 'include' })
+        .then(res => {
+          if (!res.ok) throw new Error('Unauthorized');
+          return res.json();
+        })
+        .then(data => {
+          window.userDepartment = data.department || 'ALL';
+          const deptFilter = document.getElementById('departmentFilter');
+          if (deptFilter) {
+            deptFilter.value = window.userDepartment;
+            deptFilter.disabled = window.userDepartment !== 'ALL';
+          }
+          if (typeof loadDashboard === 'function') {
+            loadDashboard(window.userDepartment, '');
+          }
+        })
+        .catch(() => window.location.href = '/login.html');
+
+      window.logout = function () {
+        fetch('/logout', { method: 'POST', credentials: 'include' })
+          .finally(() => window.location.href = "/login.html");
+      };
+
+      // Cek sesi login
+      fetch('/check-login', { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (!data.loggedIn) window.location.href = '/login.html';
+        })
+        .catch(() => window.location.href = '/login.html');
+    })();
+</script>
+</body>
+</html>

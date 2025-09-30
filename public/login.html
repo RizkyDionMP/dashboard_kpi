@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login - KPI Mazta Farma</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    body { 
+      font-family: 'Inter', sans-serif; 
+    }
+    .login-card {
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.9);
+    }
+    .input-focus:focus {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15);
+    }
+    .btn-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(5, 150, 105, 0.3);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+    .logo-glow {
+      filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.3));
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-100 via-white to-emerald-50 min-h-screen flex items-center justify-center relative overflow-hidden">
+
+  <!-- Background Pattern -->
+  <div class="absolute inset-0 opacity-10">
+    <div class="absolute inset-0" style="background-image: radial-gradient(circle at 2px 2px, rgba(16, 185, 129, 0.4) 1px, transparent 0); background-size: 30px 30px;"></div>
+  </div>
+
+  <!-- Floating Elements -->
+  <div class="absolute top-20 left-10 w-20 h-20 bg-emerald-200 rounded-full opacity-30 animate-bounce" style="animation-delay: 2s; animation-duration: 4s;"></div>
+  <div class="absolute bottom-20 right-10 w-16 h-16 bg-teal-200 rounded-full opacity-30 animate-bounce" style="animation-delay: 1s; animation-duration: 3s;"></div>
+
+  <div class="login-card shadow-2xl rounded-2xl p-10 w-full max-w-md border border-emerald-200 fade-in relative z-10">
+    
+    <!-- Logo Section -->
+    <div class="flex flex-col items-center mb-8">
+      <div class="bg-white p-4 rounded-full shadow-lg mb-4 logo-glow">
+        <img src="img/maztalogo.png" alt="Mazta Logo" class="h-14 w-auto" />
+      </div>
+      <h2 class="text-3xl font-bold text-center bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-2">
+        Login Admin
+      </h2>
+      <div class="flex items-center gap-2 text-gray-600">
+        <i class="fas fa-chart-line text-emerald-500"></i>
+        <p class="text-sm font-medium">Dashboard KPI Mazta Farma 2025</p>
+      </div>
+    </div>
+
+    <form id="loginForm" class="space-y-6">
+      
+      <!-- Email Field -->
+      <div>
+        <label for="email" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+          <i class="fas fa-envelope text-emerald-500"></i>
+          Email Address
+        </label>
+        <div class="relative">
+          <input 
+            type="email" 
+            id="email" 
+            class="w-full mt-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 focus:outline-none transition-all duration-300 input-focus bg-gray-50 focus:bg-white" 
+            placeholder="Enter your email address"
+            required 
+          />
+          <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+            <i class="fas fa-user text-gray-400"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div>
+        <label for="password" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+          <i class="fas fa-lock text-emerald-500"></i>
+          Password
+        </label>
+        <div class="relative">
+          <input 
+            type="password" 
+            id="password" 
+            class="w-full mt-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 focus:outline-none transition-all duration-300 input-focus bg-gray-50 focus:bg-white" 
+            placeholder="Enter your password"
+            required 
+          />
+          <button 
+            type="button" 
+            id="togglePassword"
+            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <i class="fas fa-eye" id="eyeIcon"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Additional Options -->
+      <div class="flex items-center justify-between text-sm">
+        <label class="flex items-center">
+          <input type="checkbox" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 mr-2">
+          <span class="text-gray-600">Remember me</span>
+        </label>
+      </div>
+
+      <!-- Login Button -->
+      <button 
+        type="submit" 
+        class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 btn-hover flex items-center justify-center gap-2"
+      >
+        <i class="fas fa-sign-in-alt"></i>
+        <span id="loginText">Sign In to Dashboard</span>
+        <div id="loginSpinner" class="hidden">
+          <i class="fas fa-spinner animate-spin"></i>
+        </div>
+      </button>
+
+      <!-- Error Message -->
+      <div id="error" class="hidden bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-lg flex items-center gap-2">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span id="errorText">Email atau password salah</span>
+      </div>
+
+    </form>
+
+    <!-- Security Info -->
+    <div class="mt-8 pt-6 border-t border-gray-200">
+      <div class="flex items-center justify-center gap-6 text-xs text-gray-500">
+        <div class="flex items-center gap-1">
+          <i class="fas fa-shield-alt text-emerald-500"></i>
+          <span>Secure Login</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <i class="fas fa-clock text-emerald-500"></i>
+          <span>24/7 Access</span>
+        </div>
+      </div>
+      <p class="text-xs text-center text-gray-400 mt-3">
+        © 2025 Mazta Farma. All rights reserved.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Help Section -->
+  <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-center">
+    <div class="bg-white bg-opacity-80 backdrop-blur-sm rounded-lg p-3 shadow-lg border border-white">
+      <p class="text-xs text-gray-600 mb-2 flex items-center justify-center gap-1">
+        <i class="fas fa-question-circle text-emerald-500"></i>
+        Need help?
+      </p>
+      <div class="flex gap-4 text-xs">
+        <a href="tel:+62-xxx-xxxx" class="text-emerald-600 hover:text-emerald-700 transition-colors flex items-center gap-1">
+          <i class="fas fa-phone"></i>
+          Call Support
+        </a>
+        <a href="mailto:support@maztafarma.com" class="text-emerald-600 hover:text-emerald-700 transition-colors flex items-center gap-1">
+          <i class="fas fa-envelope"></i>
+          Email Us
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Password visibility toggle
+    document.getElementById('togglePassword').addEventListener('click', function() {
+      const passwordInput = document.getElementById('password');
+      const eyeIcon = document.getElementById('eyeIcon');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.className = 'fas fa-eye-slash';
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.className = 'fas fa-eye';
+      }
+    });
+
+    // Enhanced login form handler
+    document.getElementById("loginForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const errorDiv = document.getElementById("error");
+      const errorText = document.getElementById("errorText");
+      const loginText = document.getElementById("loginText");
+      const loginSpinner = document.getElementById("loginSpinner");
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+
+      // Hide previous errors
+      errorDiv.classList.add("hidden");
+
+      // Show loading state
+      submitBtn.disabled = true;
+      submitBtn.classList.add("opacity-75", "cursor-not-allowed");
+      loginText.textContent = "Signing in...";
+      loginSpinner.classList.remove("hidden");
+
+      try {
+        const response = await fetch("/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ email, password }),
+        });
+
+        if (!response.ok) throw new Error("Login gagal");
+        const result = await response.json();
+
+        if (result.success) {
+          // Success state
+          loginText.textContent = "Success! Redirecting...";
+          submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Login Successful!';
+          submitBtn.classList.remove("from-emerald-600", "to-teal-600");
+          submitBtn.classList.add("bg-green-600");
+
+          // Save user data
+          localStorage.setItem("department", result.department || "ALL");
+          localStorage.setItem("email", email);
+
+          // Redirect after delay
+          setTimeout(() => {
+            window.location.href = "/index.html";
+          }, 1500);
+        } else {
+          throw new Error(result.message || "Email atau password salah");
+        }
+      } catch (err) {
+        // Reset button state
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("opacity-75", "cursor-not-allowed");
+        loginText.textContent = "Sign In to Dashboard";
+        loginSpinner.classList.add("hidden");
+
+        // Show error
+        errorText.textContent = err.message || "Gagal melakukan login. Coba lagi.";
+        errorDiv.classList.remove("hidden");
+
+        // Shake animation
+        errorDiv.style.animation = "shake 0.5s ease-in-out";
+        setTimeout(() => {
+          errorDiv.style.animation = "";
+        }, 500);
+      }
+    });
+
+    // Input validation and styling
+    const inputs = document.querySelectorAll('input[required]');
+    inputs.forEach(input => {
+      input.addEventListener('focus', function() {
+        this.parentElement.classList.add('transform', 'scale-105');
+      });
+
+      input.addEventListener('blur', function() {
+        this.parentElement.classList.remove('transform', 'scale-105');
+        
+        if (!this.value.trim()) {
+          this.classList.add('border-red-300', 'bg-red-50');
+        } else {
+          this.classList.remove('border-red-300', 'bg-red-50');
+          this.classList.add('border-green-300', 'bg-green-50');
+        }
+      });
+
+      input.addEventListener('input', function() {
+        if (this.value.trim()) {
+          this.classList.remove('border-red-300', 'bg-red-50');
+          this.classList.add('border-green-300', 'bg-green-50');
+        }
+      });
+    });
+
+    // Auto focus first input
+    document.getElementById('email').focus();
+
+    // Add shake animation for errors
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>

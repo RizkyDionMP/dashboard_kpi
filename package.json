@@ -1,0 +1,23 @@
+{
+  "name": "dashboard_kpi",
+  "version": "1.0.0",
+  "description": "Dashboard KPI Mazta Farma 2025",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "express-session": "^1.18.2",
+    "googleapis": "^105.0.0",
+    "multer": "^2.0.2"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tailwindcss": "^4.1.11"
+  }
+}
