@@ -3,6 +3,7 @@ const session = require('express-session');
 const path = require('path');
 const { google } = require('googleapis');
 const fs = require('fs');
+const multer = require('multer');
 
 const app = express();
 const PORT = 3001;
@@ -998,6 +999,416 @@ app.get('/api/sarmutindikator', requireLogin, async (req, res) => {
       detail: err.message 
     });
   }
+});
+
+// Setup Multer untuk upload file
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = './uploads/documents';
+    // Buat folder jika belum ada
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
+  fileFilter: function (req, file, cb) {
+    const allowedTypes = /pdf|doc|docx|xls|xlsx/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+
+    if (extname && mimetype) {
+      return cb(null, true);
+    } else {
+      cb(new Error('File harus berformat PDF, DOC, DOCX, XLS, atau XLSX'));
+    }
+  }
+});
+
+// ==========================================
+// API ENDPOINTS
+// ==========================================
+
+// 📤 Upload Document
+app.post('/api/documents/upload', requireLogin, upload.single('document'), async (req, res) => {
+  try {
+    console.log('Upload attempt by:', req.session.name, 'Role:', req.session.role);
+    
+    // Hanya admin dan head yang bisa upload
+    if (req.session.role !== 'admin' && req.session.role !== 'head') {
+      if (req.file) fs.unlinkSync(req.file.path);
+      return res.status(403).json({ error: 'Anda tidak memiliki akses untuk upload dokumen' });
+    }
+
+    const { title, category, description } = req.body;
+    const file = req.file;
+
+    console.log('Upload data:', { title, category, hasFile: !!file });
+
+    if (!file) {
+      return res.status(400).json({ error: 'File dokumen wajib diupload' });
+    }
+
+    if (!title || !category) {
+      fs.unlinkSync(file.path);
+      return res.status(400).json({ error: 'Judul dan kategori wajib diisi' });
+    }
+
+    // Ambil data existing dari sheet documents
+    let existingData = [];
+    try {
+      existingData = await getSheetData('documents');
+    } catch (err) {
+      console.log('Sheet documents belum ada atau kosong, akan dibuat baris baru');
+    }
+
+    const newRow = [
+      Date.now().toString(),
+      title,
+      category,
+      description || '',
+      file.filename,
+      file.originalname,
+      file.size.toString(),
+      req.session.name || req.session.username,
+      new Date().toISOString(),
+    ];
+
+    console.log('Attempting to write to sheet documents:', newRow);
+
+    const spreadsheetId = SPREADSHEET_ID;
+
+    await sheets.spreadsheets.values.append({
+      spreadsheetId,
+      range: 'documents!A:I',
+      valueInputOption: 'USER_ENTERED',
+      resource: { values: [newRow] }
+    });
+
+    console.log('Sheet append successful');
+
+    res.json({
+      success: true,
+      message: 'Dokumen berhasil diupload',
+      document: {
+        id: newRow[0],
+        title,
+        category,
+        filename: file.filename
+      }
+    });
+
+  } catch (err) {
+    console.error('Upload error DETAILS:', err.message);
+    console.error('Full error:', err);
+    
+    // Hapus file jika ada error
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+    
+    res.status(500).json({ 
+      error: 'Gagal upload dokumen',
+      details: err.message 
+    });
+  }
+});
+
+// 📋 Get All Documents
+app.get('/api/documents', requireLogin, async (req, res) => {
+  try {
+    console.log("Fetch documents...");
+    const category = req.query.category;
+    let data = await getSheetData('documents');
+    console.log("Data documents:", data.length);
+
+    // Filter by category jika ada
+    if (category) {
+      data = data.filter(doc => doc.Category === category);
+    }
+
+    const documents = data.map(doc => ({
+      id: doc.ID,
+      title: doc.Title,
+      category: doc.Category,
+      description: doc.Description,
+      filename: doc.Filename,
+      originalName: doc.OriginalName,
+      fileSize: doc.FileSize,
+      uploadedBy: doc.UploadedBy,
+      uploadDate: doc.UploadDate,
+      canDelete: req.session.role === 'admin' || doc.UploadedBy === req.session.name
+    }));
+
+    res.json(documents);
+  } catch (err) {
+    console.error('Error loading documents:', err);
+    res.status(500).json({ error: 'Gagal memuat dokumen', detail: err.message });
+  }
+});
+
+// 📥 Download Document
+app.get('/api/documents/download/:id', requireLogin, async (req, res) => {
+  try {
+    const docId = req.params.id;
+    const data = await getSheetData('documents');
+    const doc = data.find(d => d.ID === docId);
+
+    if (!doc) {
+      return res.status(404).json({ error: 'Dokumen tidak ditemukan' });
+    }
+
+    const filePath = path.join(__dirname, 'uploads', 'documents', doc.Filename);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: 'File tidak ditemukan di server' });
+    }
+
+    res.setHeader('Content-Disposition', `attachment; filename="${doc.OriginalName}"`);
+    res.setHeader('Content-Type', 'application/octet-stream');
+
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+
+  } catch (err) {
+    console.error('Download error:', err);
+    res.status(500).json({ error: 'Gagal download dokumen' });
+  }
+});
+
+// 👁️ Preview Document (untuk PDF)
+app.get('/api/documents/preview/:id', requireLogin, async (req, res) => {
+  try {
+    const docId = req.params.id;
+    const data = await getSheetData('documents');
+    const doc = data.find(d => d.ID === docId);
+
+    if (!doc) {
+      return res.status(404).json({ error: 'Dokumen tidak ditemukan' });
+    }
+
+    const filePath = path.join(__dirname, 'uploads', 'documents', doc.Filename);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: 'File tidak ditemukan di server' });
+    }
+
+    const isPdf = doc.OriginalName.toLowerCase().endsWith('.pdf');
+    
+    if (!isPdf) {
+      return res.status(400).json({ error: 'Preview hanya tersedia untuk file PDF' });
+    }
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${doc.OriginalName}"`);
+
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+
+  } catch (err) {
+    console.error('Preview error:', err);
+    res.status(500).json({ error: 'Gagal preview dokumen' });
+  }
+});
+
+// 🗑️ Delete Document
+app.delete('/api/documents/delete/:id', requireLogin, async (req, res) => {
+  try {
+    const docId = req.params.id;
+    const data = await getSheetData('documents');
+    const docIndex = data.findIndex(d => d.ID === docId);
+
+    if (docIndex === -1) {
+      return res.status(404).json({ error: 'Dokumen tidak ditemukan' });
+    }
+
+    const doc = data[docIndex];
+
+    if (req.session.role !== 'admin' && doc.UploadedBy !== req.session.name) {
+      return res.status(403).json({ error: 'Anda tidak memiliki akses untuk menghapus dokumen ini' });
+    }
+
+    // Hapus file dari server
+    const filePath = path.join(__dirname, 'uploads', 'documents', doc.Filename);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    const spreadsheetId = SPREADSHEET_ID;
+
+    await sheets.spreadsheets.values.clear({
+      spreadsheetId,
+      range: `documents!A${docIndex + 2}:I${docIndex + 2}`,
+    });
+
+    res.json({ success: true, message: 'Dokumen berhasil dihapus' });
+
+  } catch (err) {
+    console.error('Delete error:', err);
+    res.status(500).json({ error: 'Gagal menghapus dokumen' });
+  }
+});
+
+// 📋 Get All Documents
+app.get('/api/documents', requireLogin, async (req, res) => {
+  try {
+    const category = req.query.category;
+    let data = await getSheetData('documents');
+
+    // Filter by category jika ada
+    if (category) {
+      data = data.filter(doc => doc.Category === category);
+    }
+
+    const documents = data.map(doc => ({
+      id: doc.ID,
+      title: doc.Title,
+      category: doc.Category,
+      description: doc.Description,
+      filename: doc.Filename,
+      originalName: doc.OriginalName,
+      fileSize: doc.FileSize,
+      uploadedBy: doc.UploadedBy,
+      uploadDate: doc.UploadDate,
+      // User hanya bisa delete dokumen sendiri (atau admin bisa delete semua)
+      canDelete: req.session.role === 'admin' || doc.UploadedBy === req.session.name
+    }));
+
+    res.json(documents);
+  } catch (err) {
+    console.error('Error loading documents:', err);
+    res.status(500).json({ error: 'Gagal memuat dokumen' });
+  }
+});
+
+// 📥 Download Document
+app.get('/api/documents/download/:id', requireLogin, async (req, res) => {
+  try {
+    const docId = req.params.id;
+    const data = await getSheetData('documents');
+    const doc = data.find(d => d.ID === docId);
+
+    if (!doc) {
+      return res.status(404).json({ error: 'Dokumen tidak ditemukan' });
+    }
+
+    const filePath = path.join(__dirname, 'uploads', 'documents', doc.Filename);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: 'File tidak ditemukan di server' });
+    }
+
+    // Set headers untuk download
+    res.setHeader('Content-Disposition', `attachment; filename="${doc.OriginalName}"`);
+    res.setHeader('Content-Type', 'application/octet-stream');
+
+    // Stream file ke response
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+
+  } catch (err) {
+    console.error('Download error:', err);
+    res.status(500).json({ error: 'Gagal download dokumen' });
+  }
+});
+
+// 👁️ Preview Document (untuk PDF)
+app.get('/api/documents/preview/:id', requireLogin, async (req, res) => {
+  try {
+    const docId = req.params.id;
+    const data = await getSheetData('documents');
+    const doc = data.find(d => d.ID === docId);
+
+    if (!doc) {
+      return res.status(404).json({ error: 'Dokumen tidak ditemukan' });
+    }
+
+    const filePath = path.join(__dirname, 'uploads', 'documents', doc.Filename);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: 'File tidak ditemukan di server' });
+    }
+
+    // Cek apakah file adalah PDF
+    const isPdf = doc.OriginalName.toLowerCase().endsWith('.pdf');
+    
+    if (!isPdf) {
+      return res.status(400).json({ error: 'Preview hanya tersedia untuk file PDF' });
+    }
+
+    // Set headers untuk preview inline (tidak download)
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${doc.OriginalName}"`);
+
+    // Stream file ke response
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+
+  } catch (err) {
+    console.error('Preview error:', err);
+    res.status(500).json({ error: 'Gagal preview dokumen' });
+  }
+});
+
+// 🗑️ Delete Document
+app.delete('/api/documents/delete/:id', requireLogin, async (req, res) => {
+  try {
+    const docId = req.params.id;
+    const data = await getSheetData('documents');
+    const docIndex = data.findIndex(d => d.ID === docId);
+
+    if (docIndex === -1) {
+      return res.status(404).json({ error: 'Dokumen tidak ditemukan' });
+    }
+
+    const doc = data[docIndex];
+
+    // Cek permission: admin bisa hapus semua, user hanya bisa hapus miliknya
+    if (req.session.role !== 'admin' && doc.UploadedBy !== req.session.name) {
+      return res.status(403).json({ error: 'Anda tidak memiliki akses untuk menghapus dokumen ini' });
+    }
+
+    // Hapus file dari server
+    const filePath = path.join(__dirname, 'uploads', 'documents', doc.Filename);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    // Hapus row dari Google Sheets
+    const sheets = await getGoogleSheetsClient();
+    const spreadsheetId = process.env.SPREADSHEET_ID;
+
+    await sheets.spreadsheets.values.clear({
+      spreadsheetId,
+      range: `documents!A${docIndex + 2}:I${docIndex + 2}`, // +2 karena header + index mulai dari 0
+    });
+
+    res.json({ success: true, message: 'Dokumen berhasil dihapus' });
+
+  } catch (err) {
+    console.error('Delete error:', err);
+    res.status(500).json({ error: 'Gagal menghapus dokumen' });
+  }
+});
+
+// ==========================================
+// API untuk mendapatkan session user saat ini
+// ==========================================
+app.get('/api/current-session', requireLogin, (req, res) => {
+  res.json({
+    username: req.session.username,
+    name: req.session.name,
+    role: req.session.role,
+    department: req.session.department
+  });
 });
 
 // ========================

@@ -832,11 +832,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
-function setChartSize(canvasId, width, height) {
-  const canvas = document.getElementById(canvasId);
-  canvas.width = width;
-  canvas.height = height;
-  return canvas.getContext('2d');
+function setChartSize(canvasId) {
+  return document.getElementById(canvasId).getContext('2d');
 }
 
 let selectedDept = null;   // simpan dept yang dipilih
@@ -844,145 +841,148 @@ let selectedPersonal = null; // simpan personal yang dipilih
 
   // Workload Chart
   function renderWorkloadChart(data) {
-    if (workloadChart) workloadChart.destroy();
+  if (workloadChart) workloadChart.destroy();
 
-    const labels = data.map(d => d.name);
-    const values = data.map(d => d.workload);
+  const labels = data.map(d => d.name);
+  const values = data.map(d => d.workload);
 
-    const ctx = setChartSize('workloadChart', 600, 350);
+  const ctx = setChartSize('workloadChart');
 
-    workloadChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [{
-          label: 'Workload',
-          data: values,
-          backgroundColor: labels.map(name =>
-            name === selectedPersonal ? 'rgba(234,179,8,0.8)' : 'rgba(34,197,94,0.7)'
-          ),
-          borderRadius: 5
-        }]
-      },
-      options: {
-        responsive: false,
-        onClick: (evt, elements) => {
-          if (elements.length > 0) {
-            const idx = elements[0].index;
-            const personal = labels[idx];
-            const value = values[idx];
+  workloadChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Workload',
+        data: values,
+        backgroundColor: labels.map(name =>
+          name === selectedPersonal ? 'rgba(234,179,8,0.8)' : 'rgba(34,197,94,0.7)'
+        ),
+        borderRadius: 5
+      }]
+    },
+    options: {
+      responsive: true,              // ✅ Ubah ke true
+      maintainAspectRatio: true,     // ✅ Tambahkan ini
+      aspectRatio: 2,                // ✅ Rasio 2:1 (lebar:tinggi)
+      onClick: (evt, elements) => {
+        if (elements.length > 0) {
+          const idx = elements[0].index;
+          const personal = labels[idx];
 
-            // toggle
-            if (selectedPersonal === personal) {
-              selectedPersonal = null;
-              loadDashboard('ALL', 'ALL', 'ALL');
-            } else {
-              selectedPersonal = personal;
-              loadDashboard('ALL', 'ALL', personal);
-            }
-
-            renderWorkloadChart(data);
+          if (selectedPersonal === personal) {
+            selectedPersonal = null;
+            loadDashboard('ALL', 'ALL', 'ALL');
+          } else {
+            selectedPersonal = personal;
+            loadDashboard('ALL', 'ALL', personal);
           }
-        },
-        plugins: {
-          legend: { display: false },
-          datalabels: {
-            anchor: 'end',
-            align: 'end',
-            color: '#000000',
-            font: { weight: 'bold', size: 16 }, // ⬅️ naikkan font value di atas bar
-            formatter: value => value.toFixed(2)
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { 
-              color: 'black', 
-              font: { weight: 'bold', size: 14 } // ⬅️ font angka sumbu Y
-            },
-            grid: { color: '#ffffffff' }
-          },
-          x: {
-            ticks: { 
-              color: 'Black', 
-              font: { weight: 'bold', size: 14 } // ⬅️ font nama personal di bawah bar
-            },
-            grid: { display: false }
-          }
+
+          renderWorkloadChart(data);
         }
       },
-      plugins: [ChartDataLabels]
-    });
-  }
-
-  // Avg Dept Bar Chart
-  function renderAvgDeptBarChart(labels, values) {
-    if (avgDeptBarChart) avgDeptBarChart.destroy();
-    const ctx = setChartSize('avgDeptBarChart', 600, 350);
-
-    avgDeptBarChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [{
-          label: 'Rata-rata Workload per Departemen',
-          data: values,
-          backgroundColor: labels.map(dept =>
-            dept === selectedDept ? 'rgba(234,179,8,0.8)' : 'rgba(59,130,246,0.7)'
-          )
-        }]
-      },
-      options: {
-        responsive: false,
-        onClick: (evt, elements) => {
-          if (elements.length > 0) {
-            const idx = elements[0].index;
-            const dept = labels[idx];
-            const value = values[idx];
-
-            if (selectedDept === dept) {
-              selectedDept = null;
-              loadDashboard('ALL', 'ALL', 'ALL');
-            } else {
-              selectedDept = dept;
-              loadDashboard(dept, 'ALL', 'ALL');
-            }
-
-            renderAvgDeptBarChart(labels, values);
-          }
-        },
-        plugins: {
-          legend: { display: false },
-          datalabels: {
-            anchor: 'end',
-            align: 'end',
-            color: '#000000',
-            font: { weight: 'bold', size: 16 }, // ⬅️ font value bar
-            formatter: value => value.toFixed(2)
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { 
-              color: 'black', 
-              font: { weight: 'bold', size: 14 } // ⬅️ angka sumbu Y
-            },
-            grid: { color: '#ffffffff' }
-          },
-          x: {
-            ticks: { 
-              color: 'black', 
-              font: { weight: 'bold', size: 14 } // ⬅️ nama departemen
-            },
-            grid: { display: false }
-          }
+      plugins: {
+        legend: { display: false },
+        datalabels: {
+          anchor: 'end',
+          align: 'end',
+          color: '#000000',
+          font: { weight: 'bold', size: 14 }, // ✅ Turunkan sedikit
+          formatter: value => value.toFixed(2)
         }
       },
-      plugins: [ChartDataLabels]
-    });
-  }
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { 
+            color: 'black', 
+            font: { weight: 'bold', size: 12 }
+          },
+          grid: { color: '#ffffffff' }
+        },
+        x: {
+          ticks: { 
+            color: 'black', 
+            font: { weight: 'bold', size: 12 },
+            maxRotation: 45,        // ✅ Rotasi label kalau terlalu panjang
+            minRotation: 45
+          },
+          grid: { display: false }
+        }
+      }
+    },
+    plugins: [ChartDataLabels]
+  });
+}
+
+// Update renderAvgDeptBarChart
+function renderAvgDeptBarChart(labels, values) {
+  if (avgDeptBarChart) avgDeptBarChart.destroy();
+  const ctx = setChartSize('avgDeptBarChart');
+
+  avgDeptBarChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Rata-rata Workload per Departemen',
+        data: values,
+        backgroundColor: labels.map(dept =>
+          dept === selectedDept ? 'rgba(234,179,8,0.8)' : 'rgba(59,130,246,0.7)'
+        )
+      }]
+    },
+    options: {
+      responsive: true,              // ✅ Ubah ke true
+      maintainAspectRatio: true,     // ✅ Tambahkan ini
+      aspectRatio: 2,                // ✅ Rasio 2:1
+      onClick: (evt, elements) => {
+        if (elements.length > 0) {
+          const idx = elements[0].index;
+          const dept = labels[idx];
+
+          if (selectedDept === dept) {
+            selectedDept = null;
+            loadDashboard('ALL', 'ALL', 'ALL');
+          } else {
+            selectedDept = dept;
+            loadDashboard(dept, 'ALL', 'ALL');
+          }
+
+          renderAvgDeptBarChart(labels, values);
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        datalabels: {
+          anchor: 'end',
+          align: 'end',
+          color: '#000000',
+          font: { weight: 'bold', size: 14 },
+          formatter: value => value.toFixed(2)
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { 
+            color: 'black', 
+            font: { weight: 'bold', size: 12 }
+          },
+          grid: { color: '#ffffffff' }
+        },
+        x: {
+          ticks: { 
+            color: 'black', 
+            font: { weight: 'bold', size: 12 }
+          },
+          grid: { display: false }
+        }
+      }
+    },
+    plugins: [ChartDataLabels]
+  });
+}
 
 // ==============================
 // Fetch Sasaran Mutu
@@ -1086,19 +1086,13 @@ function toggleTable(contentId, btn) {
 // ==============================
 // Fetch Sasaran Mutu Summary (sheet sarmutindikator)
 // ==============================
-async function fetchSasaranMutuSummary(filters = {}) {
-  try {
-    const res = await fetch("/api/sarmutindikator", { credentials: "include" });
-    let data = await res.json();
+let sasaranMutuSummaryDataMaster = [];
 
-    if (filters.department && filters.department !== "ALL") {
-      data = data.filter(row => row.DEPT === filters.department);
-    }
-
-    renderSasaranMutuSummaryTable(data);
-  } catch (err) {
-    console.error("Error fetchSasaranMutuSummary:", err);
-  }
+async function fetchSasaranMutuSummary() {
+  const res = await fetch("/api/sarmutindikator", { credentials: "include" });
+  const data = await res.json();
+  sasaranMutuSummaryDataMaster = data;
+  renderSasaranMutuSummaryTable(data); // tampil awal
 }
 
 // ==============================
@@ -1185,62 +1179,67 @@ let currentSarmutMode = "ALL";
 let userRole = window.USER_ROLE || "staff"; // ⭐ pastikan server me-render role user ke JS
 
 function filterSasaranMutu(mode = currentSarmutMode) {
-  if (!sasaranMutuDataMaster.length) return;
+  // Fokus: filter summary indikator (sarmutindikator)
+  if (!sasaranMutuSummaryDataMaster.length) return;
 
   currentSarmutMode = mode;
-  let filtered = [...sasaranMutuDataMaster];
-
   const dept = document.getElementById("filterDeptSarmut").value;
+  // const bulan = document.getElementById("filterBulan")?.value; // opsional
 
+  // Step 1: Ambil hanya baris % ACH
+  let summaryFiltered = sasaranMutuSummaryDataMaster.filter(
+    row => (row["KATEGORI"] || "").trim().toUpperCase() === "% ACH"
+  );
+
+  // Step 2: Filter Department (jika dipilih)
   if (dept && dept !== "ALL") {
-    filtered = filtered.filter(
+    summaryFiltered = summaryFiltered.filter(
       row =>
-        (row["Department"] || "").toLowerCase().trim() ===
-        dept.toLowerCase().trim()
+        (row["DEPT"] || "").toLowerCase().trim() === dept.toLowerCase().trim()
     );
-
-    // ✅ tampilkan chart kalau dept = MKT atau role = head
-    if (dept.toUpperCase() === "MKT" || userRole === "head") {
-      document.getElementById("sarmutCharts").classList.remove("hidden");
-      const produk = document.getElementById("produkSelect").value;
-      if (produk) renderChart(produk, dept);
-    } else {
-      document.getElementById("sarmutCharts").classList.add("hidden");
-    }
-  } else {
-    // kalau ALL → tampilkan chart jika user head
-    if (userRole === "head") {
-      document.getElementById("sarmutCharts").classList.remove("hidden");
-      const produk = document.getElementById("produkSelect").value;
-      if (produk) renderChart(produk, "ALL");
-    } else {
-      document.getElementById("sarmutCharts").classList.add("hidden");
-    }
   }
 
-  // 🔹 Mode Achieved / Not Achieved
+  // Step 3: Helper parsing angka persen
+  const parsePercent = (val) => {
+    if (!val) return 0;
+    const num = parseFloat(String(val).replace("%", "").replace(",", ".").trim());
+    return isNaN(num) ? 0 : num;
+  };
+
+  // Step 4: Hitung status Achieved / Not Achieved
+  summaryFiltered = summaryFiltered.map(row => {
+    const bulanKeys = [
+      "JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"
+    ];
+    // Ambil semua nilai bulan yg ada
+    const nilaiBulan = bulanKeys
+      .map(k => parsePercent(row[k]))
+      .filter(v => v > 0); // hanya ambil yang terisi
+
+    // Kalau ada satu aja <100 → Not Achieved
+    const achieved = nilaiBulan.length > 0 && nilaiBulan.every(v => v === 100);
+    return { ...row, isAchieved: achieved };
+  });
+
+  // Step 5: Filter mode (Achieved / Not Achieved)
   if (mode === "ACHIEVED") {
-    filtered = filtered.filter(
-      r => (r["Ach"] || "").toString().trim() === "100%"
-    );
+    summaryFiltered = summaryFiltered.filter(r => r.isAchieved);
   } else if (mode === "NOT_ACHIEVED") {
-    filtered = filtered.filter(
-      r => (r["Ach"] || "").toString().trim() !== "100%"
-    );
+    summaryFiltered = summaryFiltered.filter(r => !r.isAchieved);
   }
 
-  // 🔹 Summary
-  const total = filtered.length;
-  const achieved = filtered.filter(
-    r => (r["Ach"] || "").toString().trim() === "100%"
-  ).length;
+  // Step 6: Hitung total summary
+  const total = summaryFiltered.length;
+  const achieved = summaryFiltered.filter(r => r.isAchieved).length;
   const notAchieved = total - achieved;
 
+  // Step 7: Update summary angka di UI
   document.getElementById("sarmutTotal").textContent = total;
   document.getElementById("sarmutAchieved").textContent = achieved;
   document.getElementById("sarmutNotAchieved").textContent = notAchieved;
 
-  renderSasaranMutuTable(filtered);
+  // Step 8: Render tabel summary indikator (hasil filter)
+  renderSasaranMutuSummaryTable(summaryFiltered);
 }
 
 // ==============================
@@ -1260,6 +1259,10 @@ function populateDeptSarmutFilter() {
   // 🔹 filter ulang ketika dropdown berubah
   select.onchange = () => filterSasaranMutu(currentSarmutMode);
 }
+
+window.addEventListener("DOMContentLoaded", async () => {
+  await fetchSasaranMutuSummary();
+});
 
 let chartSarmutLine = null;
 let chartSarmutPercent = null;
@@ -1466,25 +1469,26 @@ function renderChart(produk, department = "ALL") {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 2.5,
+      interaction: {
+        mode: 'point',
+        intersect: false
+      },
       plugins: {
         legend: { 
           labels: { color: "#000000ff", font: { size: 14 } }
         },
         tooltip: {
+          enabled: true,
+          mode: 'point',
           bodyFont: { size: 14 },
           callbacks: {
             label: ctx => `${ctx.dataset.label}: ${rupiahFmt(ctx.parsed.y)}`
           }
         },
         datalabels: {
-          color: "#000000ff",
-          anchor: "end",
-          align: "top",
-          font: { size: 16, weight: "bold" },
-          formatter: value => value > 0 ? rupiahFmt(value) : '',
-          display: function(context) {
-            return context.dataset.data[context.dataIndex] > 0;
-          }
+          display: false  // Hilangkan permanent labels
         }
       },
       scales: {
@@ -2878,12 +2882,6 @@ function showProject(type) {
 // ==============================
 document.addEventListener("DOMContentLoaded", function() {
   console.log('Enhanced Project module initialization...');
-  
-  // REMOVED: Auto-load kolaborasi - let user choose from menu instead
-  // setTimeout(() => {
-  //   fetchProjectKolaborasi();
-  // }, 500);
-  
   console.log('Enhanced Project module loaded successfully');
 });
 
@@ -2947,6 +2945,275 @@ window.filterMandiriByDepartment = filterMandiriByDepartment;
       console.error('Gagal update employee filter:', err);
     }
   }
+
+  // dokumen section
+  let allDocuments = [];
+  let currentPreviewDocId = null;
+
+    // File input change
+    document.getElementById('fileInput')?.addEventListener('change', function(e) {
+      const fileName = e.target.files[0]?.name || 'Belum ada file dipilih';
+      document.getElementById('fileName').textContent = fileName;
+    });
+
+    // Check user role
+    async function checkUserRole() {
+      try {
+        const res = await fetch('/api/current-session', { credentials: 'include' });
+        const user = await res.json();
+        
+        // Hanya admin yang bisa lihat upload section
+        if (user.role === 'admin') {
+          document.getElementById('uploadSection').classList.remove('hidden');
+        }
+      } catch (err) {
+        console.error('Error checking user role:', err);
+      }
+    }
+
+    // Upload document
+    document.getElementById('uploadDocForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Uploading...';
+      
+      try {
+        const res = await fetch('/api/documents/upload', {
+          method: 'POST',
+          body: formData,
+          credentials: 'include'
+        });
+        
+        const result = await res.json();
+        
+        if (res.ok) {
+          alert('✅ Dokumen berhasil diupload!');
+          e.target.reset();
+          document.getElementById('fileName').textContent = 'Belum ada file dipilih';
+          loadDocuments();
+        } else {
+          alert('❌ ' + (result.error || 'Gagal upload dokumen'));
+        }
+      } catch (err) {
+        console.error('Upload error:', err);
+        alert('❌ Terjadi kesalahan saat upload');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-upload mr-2"></i> Upload Dokumen';
+      }
+    });
+
+    // Load documents
+    async function loadDocuments() {
+      const container = document.getElementById('documentsList');
+      container.innerHTML = '<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i></div>';
+      
+      try {
+        const res = await fetch('/api/documents', { credentials: 'include' });
+        allDocuments = await res.json();
+        
+        applyFiltersAndSort();
+      } catch (err) {
+        console.error('Error loading documents:', err);
+        container.innerHTML = '<div class="text-center py-8 text-red-500">Gagal memuat dokumen</div>';
+      }
+    }
+
+    // Apply filters and sort
+    function applyFiltersAndSort() {
+      const container = document.getElementById('documentsList');
+      const category = document.getElementById('categoryFilter').value;
+      const sortBy = document.getElementById('sortBy').value;
+      
+      let filtered = [...allDocuments];
+      
+      // Filter by category
+      if (category) {
+        filtered = filtered.filter(doc => doc.category === category);
+      }
+      
+      // Sort
+      filtered.sort((a, b) => {
+        switch(sortBy) {
+          case 'newest':
+            return new Date(b.uploadDate) - new Date(a.uploadDate);
+          case 'oldest':
+            return new Date(a.uploadDate) - new Date(b.uploadDate);
+          case 'title':
+            return a.title.localeCompare(b.title);
+          case 'title-desc':
+            return b.title.localeCompare(a.title);
+          default:
+            return 0;
+        }
+      });
+      
+      displayDocuments(filtered);
+    }
+
+    // Display documents
+    function displayDocuments(docs) {
+      const container = document.getElementById('documentsList');
+      
+      if (!docs || docs.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-gray-500">
+            <i class="fas fa-inbox text-5xl mb-4"></i>
+            <p class="text-lg">Belum ada dokumen</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = docs.map(doc => {
+        const isPdf = doc.originalName.toLowerCase().endsWith('.pdf');
+        return `
+          <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:shadow-md transition-all">
+            <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-white text-xl">
+              <i class="fas fa-file-${getFileIcon(doc.filename)}"></i>
+            </div>
+            
+            <div class="flex-1">
+              <h4 class="font-bold text-gray-900 dark:text-white">${doc.title}</h4>
+              <p class="text-sm text-gray-600 dark:text-gray-400">${doc.description || 'Tidak ada deskripsi'}</p>
+              <div class="flex gap-3 mt-2 text-xs text-gray-500">
+                <span><i class="fas fa-tag"></i> ${doc.category}</span>
+                <span><i class="fas fa-calendar"></i> ${formatDate(doc.uploadDate)}</span>
+                <span><i class="fas fa-user"></i> ${doc.uploadedBy}</span>
+              </div>
+            </div>
+            
+            <div class="flex gap-2">
+              ${isPdf ? `
+                <button onclick="previewDocument('${doc.id}', '${doc.title}')"
+                  class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                  title="Preview PDF">
+                  <i class="fas fa-eye"></i>
+                  <span class="hidden sm:inline">Preview</span>
+                </button>
+              ` : ''}
+              <a href="/api/documents/download/${doc.id}" target="_blank"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                title="Download">
+                <i class="fas fa-download"></i>
+                <span class="hidden sm:inline">Download</span>
+              </a>
+              ${doc.canDelete ? `
+                <button onclick="deleteDocument('${doc.id}')"
+                  class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                  title="Hapus">
+                  <i class="fas fa-trash"></i>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Preview document - UPDATED
+      function previewDocument(docId, title) {
+        currentPreviewDocId = docId;
+        const modal = document.getElementById('previewModal');
+        const iframe = document.getElementById('pdfFrame');
+        const titleEl = document.getElementById('previewTitle');
+        
+        titleEl.innerHTML = `<i class="fas fa-file-pdf text-red-600"></i> ${title}`;
+        iframe.src = `/api/documents/preview/${docId}`;
+        modal.style.display = 'flex'; // ✅ Ubah dari classList.add('active')
+        
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden';
+      }
+
+      // Close preview - UPDATED
+      function closePreview(event) {
+        if (event && event.target !== event.currentTarget) return;
+        
+        const modal = document.getElementById('previewModal');
+        const iframe = document.getElementById('pdfFrame');
+        
+        modal.style.display = 'none'; // ✅ Ubah dari classList.remove('active')
+        iframe.src = '';
+        currentPreviewDocId = null;
+        
+        // Restore body scroll
+        document.body.style.overflow = '';
+      }
+
+    // Download from preview
+    function downloadFromPreview() {
+      if (currentPreviewDocId) {
+        window.open(`/api/documents/download/${currentPreviewDocId}`, '_blank');
+      }
+    }
+
+    // Filter documents
+    function filterDocuments() {
+      applyFiltersAndSort();
+    }
+
+    // Sort documents
+    function sortDocuments() {
+      applyFiltersAndSort();
+    }
+
+    // Delete document
+    async function deleteDocument(docId) {
+      if (!confirm('Yakin ingin menghapus dokumen ini?')) return;
+      
+      try {
+        const res = await fetch(`/api/documents/delete/${docId}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        });
+        
+        if (res.ok) {
+          alert('✅ Dokumen berhasil dihapus');
+          loadDocuments();
+        } else {
+          alert('❌ Gagal menghapus dokumen');
+        }
+      } catch (err) {
+        console.error('Delete error:', err);
+        alert('❌ Terjadi kesalahan');
+      }
+    }
+
+    // Helper: Get file icon
+    function getFileIcon(filename) {
+      const ext = filename.split('.').pop().toLowerCase();
+      if (ext === 'pdf') return 'pdf';
+      if (['doc', 'docx'].includes(ext)) return 'word';
+      if (['xls', 'xlsx'].includes(ext)) return 'excel';
+      return 'alt';
+    }
+
+    // Helper: Format date
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('id-ID', { 
+        day: 'numeric', 
+        month: 'short', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closePreview();
+      }
+    });
+
+    // Initialize
+    checkUserRole();
+    loadDocuments();
 
   // ========================
   // Cek User & Load Dashboard

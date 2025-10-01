@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>KPI Dashboard Mazta Farma 2025</title>
+  <link rel="icon" type="image/png" href="/img/maztalogo.png" />
   <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
@@ -97,6 +98,14 @@
             </button>
           </div>
         </details>
+
+         <!-- NEW: Dokumen Section -->
+        <button onclick="showSection('dokumentSection')" 
+          class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-red-600/20 hover:to-red-500/20 transition-all duration-200 group">
+          <span class="text-2xl group-hover:scale-110 transition-transform duration-200">📄</span>
+          <span class="text-base font-medium">Dokumen</span>
+        </button>
+      </nav>
       </nav>
 
       <!-- Logout Button -->
@@ -227,14 +236,14 @@
             <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
               <span class="text-2xl">📊</span> Workload
             </h3>
-            <canvas id="workloadChart" height="300"></canvas>
+            <canvas id="workloadChart"></canvas>
           </div>
 
           <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200/50 dark:border-gray-700/50">
             <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
               <span class="text-2xl">📈</span> Rata-Rata Workload per Unit
             </h3>
-            <canvas id="avgDeptBarChart" height="300"></canvas>
+            <canvas id="avgDeptBarChart"></canvas>
           </div>
         </div>
       </section>
@@ -691,8 +700,8 @@
             </button>
           </div>
         </div>
-        <div class="bg-white dark:bg-gray-800 rounded-lg p-4 aspect-[16/6]">
-          <canvas id="chartSarmutLine" class="w-full h-full"></canvas>
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6">
+          <canvas id="chartSarmutLine"></canvas>
         </div>
       </div>
 
@@ -1212,6 +1221,161 @@
     </div>
   </div>
 </section>
+
+<!-- Dokumen Section -->
+  <section id="dokumentSection" class="hidden p-6 space-y-8">
+    <div class="mb-8">
+      <h2 class="text-3xl font-bold mb-2 bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+        📄 Dokumen KPI
+      </h2>
+      <p class="text-gray-600 dark:text-gray-400">
+        Upload dan kelola dokumen dasar aturan penilaian KPI
+      </p>
+    </div>
+
+    <!-- Upload Section -->
+    <div id="uploadSection" class="mb-8 hidden">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+        <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+          <i class="fas fa-cloud-upload-alt text-blue-600"></i>
+          Upload Dokumen Baru
+        </h3>
+        
+        <form id="uploadDocForm" enctype="multipart/form-data" class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold mb-2">Judul Dokumen</label>
+            <input type="text" name="title" required
+              class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              placeholder="contoh: Dasar Aturan Penilaian KPI 2025">
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold mb-2">Kategori</label>
+            <select name="category" required
+              class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+              <option value="">-- Pilih Kategori --</option>
+              <option value="Aturan KPI">Aturan KPI</option>
+              <option value="Panduan">Panduan</option>
+              <option value="Form">Form</option>
+              <option value="Kebijakan">Kebijakan</option>
+              <option value="Lainnya">Lainnya</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold mb-2">Deskripsi (Opsional)</label>
+            <textarea name="description" rows="3"
+              class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              placeholder="Tambahkan deskripsi singkat tentang dokumen ini..."></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold mb-2">
+              File Dokumen <span class="text-gray-500 text-xs">(PDF, DOC, DOCX, XLS, XLSX - Max 10MB)</span>
+            </label>
+            <div class="relative">
+              <input type="file" name="document" id="fileInput" required accept=".pdf,.doc,.docx,.xls,.xlsx" class="hidden">
+              <label for="fileInput" 
+                class="flex items-center justify-center gap-3 w-full px-4 py-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
+                <i class="fas fa-file-upload text-3xl text-gray-400"></i>
+                <div class="text-center">
+                  <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Klik untuk pilih file</p>
+                  <p id="fileName" class="text-xs text-gray-500 mt-1">Belum ada file dipilih</p>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="flex gap-3">
+            <button type="submit"
+              class="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 font-semibold">
+              <i class="fas fa-upload mr-2"></i> Upload Dokumen
+            </button>
+            <button type="reset"
+              class="px-6 py-3 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-800 dark:text-white rounded-xl transition-all duration-200">
+              <i class="fas fa-redo mr-2"></i> Reset
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Documents List -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <h3 class="text-xl font-bold flex items-center gap-2">
+          <i class="fas fa-folder-open text-orange-600"></i>
+          Daftar Dokumen
+        </h3>
+        
+        <div class="flex gap-3">
+          <!-- Sort by Date -->
+          <select id="sortBy" onchange="sortDocuments()"
+            class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="newest">📅 Terbaru</option>
+            <option value="oldest">📅 Terlama</option>
+            <option value="title">🔤 Judul A-Z</option>
+            <option value="title-desc">🔤 Judul Z-A</option>
+          </select>
+
+          <!-- Filter by Category -->
+          <select id="categoryFilter" onchange="filterDocuments()"
+            class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="">🏷️ Semua Kategori</option>
+            <option value="Aturan KPI">Aturan KPI</option>
+            <option value="Panduan">Panduan</option>
+            <option value="Form">Form</option>
+            <option value="Kebijakan">Kebijakan</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="documentsList" class="space-y-4">
+        <div class="text-center py-8 text-gray-500">
+          <i class="fas fa-file-alt text-4xl mb-3"></i>
+          <p>Memuat dokumen...</p>
+        </div>
+      </div>
+    </div>
+
+  <!-- Preview Modal -->
+  <!-- Preview Modal -->
+<div id="previewModal" class="modal-overlay" onclick="closePreview(event)" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.75); z-index: 9999; justify-content: center; align-items: center; padding: 20px;">
+  <div class="modal-content" onclick="event.stopPropagation()" style="background: white; border-radius: 12px; width: 95vw; max-width: 1400px; height: 90vh; max-height: 900px; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); overflow: hidden;">
+    
+    <!-- Modal Header -->
+    <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+      <h3 id="previewTitle" class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+        <i class="fas fa-file-pdf text-red-600"></i>
+        Preview Dokumen
+      </h3>
+      <button onclick="closePreview()" 
+        class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-2xl w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <!-- PDF Viewer -->
+    <div class="pdf-viewer" style="flex: 1; overflow: hidden; background: #f3f4f6; min-height: 0; padding: 0;">
+      <iframe id="pdfFrame" style="width: 100%; height: 100%; border: none;" frameborder="0"></iframe>
+    </div>
+    
+    <!-- Modal Footer -->
+    <div class="flex items-center justify-between p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+      <div class="text-sm text-gray-600 dark:text-gray-400">
+        <i class="fas fa-info-circle mr-1"></i>
+        Gunakan scroll untuk melihat seluruh dokumen
+      </div>
+      <button id="downloadFromPreview" onclick="downloadFromPreview()"
+        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2">
+        <i class="fas fa-download"></i>
+        Download
+      </button>
+    </div>
+  </div>
+  </div>
+  </section>
 
   <!-- Footer -->
       <footer class="mt-12 py-6 text-center text-gray-500 dark:text-gray-400 border-t border-gray-300 dark:border-gray-700">
