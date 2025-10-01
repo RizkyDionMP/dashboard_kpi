@@ -1019,6 +1019,14 @@ async function fetchSasaranMutu(filters = {}) {
   }
 }
 
+window.addEventListener("DOMContentLoaded", async () => {
+  await fetchSasaranMutuSummary(); 
+  populateDeptSarmutFilter();      
+  filterSasaranMutu();             
+});
+
+
+
 // ==============================
 // Render Table Sasaran Mutu
 // ==============================
@@ -1083,187 +1091,228 @@ function toggleTable(contentId, btn) {
   }
 }
 
-// ==============================
-// Fetch Sasaran Mutu Summary (sheet sarmutindikator)
-// ==============================
+// ============================== 
+// SASARAN MUTU SUMMARY & FILTER
+// ============================== 
 let sasaranMutuSummaryDataMaster = [];
+let sasaranMutuDataMaster = [];
 
-async function fetchSasaranMutuSummary() {
-  const res = await fetch("/api/sarmutindikator", { credentials: "include" });
-  const data = await res.json();
-  sasaranMutuSummaryDataMaster = data;
-  renderSasaranMutuSummaryTable(data); // tampil awal
+async function fetchSasaranMutuSummary() { 
+  try { 
+    const res = await fetch("/api/sarmutindikator", { credentials: "include" }); 
+    sasaranMutuSummaryDataMaster = await res.json(); 
+    renderSasaranMutuSummaryTable(sasaranMutuSummaryDataMaster); 
+  } catch (err) { 
+    console.error("Error fetchSasaranMutuSummary:", err); 
+  } 
 }
 
-// ==============================
-// Render Table Sasaran Mutu Summary
-// ==============================
-function renderSasaranMutuSummaryTable(data) {
-  const tbody = document.getElementById("sasaranMutuSummaryBody");
-  tbody.innerHTML = "";
-
-  if (!data || data.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="17" class="text-center py-4 text-gray-400 text-lg">Tidak ada data summary</td></tr>`;
-    return;
-  }
-
-  // Group berdasarkan SASARAN MUTU
-  const grouped = {};
-  data.forEach(row => {
-    const key = row["SASARAN MUTU"];
-    if (!grouped[key]) grouped[key] = [];
-    grouped[key].push(row);
-  });
-
-  let no = 1;
-  Object.keys(grouped).forEach(sasaran => {
-    const rows = grouped[sasaran];
-    const rowspan = rows.length;
-
-    rows.forEach((row, idx) => {
-      const tr = document.createElement("tr");
-      tr.className = "hover:bg-gray-100 transition-colors duration-200 text-base font-semibold";
-
+function renderSasaranMutuSummaryTable(data) { 
+  const tbody = document.getElementById("sasaranMutuSummaryBody"); 
+  if (!tbody) return;
+  
+  tbody.innerHTML = ""; 
+  
+  if (!data || data.length === 0) { 
+    tbody.innerHTML = `<tr><td colspan="17" class="text-center py-4 text-gray-400 text-lg">Tidak ada data summary</td></tr>`; 
+    return; 
+  } 
+  
+  const grouped = {}; 
+  data.forEach(row => { 
+    const key = row["SASARAN MUTU"]; 
+    if (!grouped[key]) grouped[key] = []; 
+    grouped[key].push(row); 
+  }); 
+  
+  let no = 1; 
+  Object.keys(grouped).forEach(sasaran => { 
+    const rows = grouped[sasaran]; 
+    const rowspan = rows.length; 
+    
+    rows.forEach((row, idx) => { 
+      const tr = document.createElement("tr"); 
+      tr.className = "hover:bg-gray-100 transition-colors duration-200 text-base font-semibold"; 
       tr.innerHTML = `
-        ${idx === 0 ? `<td class="border border-gray-400 px-3 py-2 text-center align-middle" rowspan="${rowspan}">${no++}</td>` : ""}
-        ${idx === 0 ? `<td class="border border-gray-400 px-3 py-2 font-bold text-center align-middle" rowspan="${rowspan}">${sasaran}</td>` : ""}
-        ${idx === 0 ? `<td class="border border-gray-400 px-3 py-2 text-center align-middle" rowspan="${rowspan}">${row["DEPT"] || "-"}</td>` : ""}
-        ${idx === 0 ? `<td class="border border-gray-400 px-3 py-2 text-center align-middle" rowspan="${rowspan}">${row["PERIODE EVALUASI"] || "-"}</td>` : ""}
-        <td class="border border-gray-400 px-3 py-2 text-center">${row["KATEGORI"] || "-"}</td>
-        <td class="border border-gray-400 px-3 py-2 text-center">${row["JAN"] || "-"}</td>
-        <td class="border border-gray-400 px-3 py-2 text-center">${row["FEB"] || "-"}</td>
-        <td class="border border-gray-400 px-3 py-2 text-center">${row["MAR"] || "-"}</td>
-        <td class="border border-gray-400 px-3 py-2 text-center">${row["APR"] || "-"}</td>
-        <td class="border border-gray-400 px-3 py-2 text-center">${row["MAY"] || "-"}</td>
-        <td class="border border-gray-400 px-3 py-2 text-center">${row["JUN"] || "-"}</td>
-        <td class="border border-gray-400 px-3 py-2 text-center">${row["JUL"] || "-"}</td>
-        <td class="border border-gray-400 px-3 py-2 text-center">${row["AUG"] || "-"}</td>
-        <td class="border border-gray-400 px-3 py-2 text-center">${row["SEP"] || "-"}</td>
-        <td class="border border-gray-400 px-3 py-2 text-center">${row["OCT"] || "-"}</td>
-        <td class="border border-gray-400 px-3 py-2 text-center">${row["NOV"] || "-"}</td>
+        ${idx === 0 ? `<td class="border border-gray-400 px-3 py-2 text-center align-middle" rowspan="${rowspan}">${no++}</td>` : ""} 
+        ${idx === 0 ? `<td class="border border-gray-400 px-3 py-2 font-bold text-center align-middle" rowspan="${rowspan}">${sasaran}</td>` : ""} 
+        ${idx === 0 ? `<td class="border border-gray-400 px-3 py-2 text-center align-middle" rowspan="${rowspan}">${row["DEPT"] || "-"}</td>` : ""} 
+        ${idx === 0 ? `<td class="border border-gray-400 px-3 py-2 text-center align-middle" rowspan="${rowspan}">${row["PERIODE EVALUASI"] || "-"}</td>` : ""} 
+        <td class="border border-gray-400 px-3 py-2 text-center">${row["KATEGORI"] || "-"}</td> 
+        <td class="border border-gray-400 px-3 py-2 text-center">${row["JAN"] || "-"}</td> 
+        <td class="border border-gray-400 px-3 py-2 text-center">${row["FEB"] || "-"}</td> 
+        <td class="border border-gray-400 px-3 py-2 text-center">${row["MAR"] || "-"}</td> 
+        <td class="border border-gray-400 px-3 py-2 text-center">${row["APR"] || "-"}</td> 
+        <td class="border border-gray-400 px-3 py-2 text-center">${row["MAY"] || "-"}</td> 
+        <td class="border border-gray-400 px-3 py-2 text-center">${row["JUN"] || "-"}</td> 
+        <td class="border border-gray-400 px-3 py-2 text-center">${row["JUL"] || "-"}</td> 
+        <td class="border border-gray-400 px-3 py-2 text-center">${row["AUG"] || "-"}</td> 
+        <td class="border border-gray-400 px-3 py-2 text-center">${row["SEP"] || "-"}</td> 
+        <td class="border border-gray-400 px-3 py-2 text-center">${row["OCT"] || "-"}</td> 
+        <td class="border border-gray-400 px-3 py-2 text-center">${row["NOV"] || "-"}</td> 
         <td class="border border-gray-400 px-3 py-2 text-center">${row["DEC"] || "-"}</td>
-      `;
-
-      tbody.appendChild(tr);
-    });
-  });
+      `; 
+      tbody.appendChild(tr); 
+    }); 
+  }); 
 }
 
-document.getElementById("filterDeptSarmut").addEventListener("change", (e) => {
-  const dept = e.target.value;
-  fetchSasaranMutu({ department: dept });
-  fetchSasaranMutuSummary({ department: dept });
+// ⭐ EVENT LISTENER untuk Filter Dept - SYNC DENGAN CHART
+document.addEventListener("DOMContentLoaded", () => {
+  const filterSelect = document.getElementById("filterDeptSarmut");
+  
+  if (filterSelect) {
+    filterSelect.addEventListener("change", (e) => { 
+      const dept = e.target.value; 
+      
+      console.log("🔄 Filter dept changed to:", dept);
+      
+      // Filter summary table
+      filterSasaranMutu(currentSarmutMode);
+      
+      // Filter indikator table
+      if (typeof filterSarmutIndikator === "function") {
+        filterSarmutIndikator(currentSarmutMode);
+      }
+      
+      // ⭐ CRITICAL: Show/Hide Chart berdasarkan dept
+      if (dept.toUpperCase() === "MKT") {
+        fetchChartSarmut(dept);
+      } else {
+        hideChartSarmut();
+      }
+    }); 
+  }
 });
 
-function toggleTable(contentId, btn) {
-  const el = document.getElementById(contentId);
-  if (!el) return;
-  el.classList.toggle("hidden");
+function toggleTable(contentId, btn) { 
+  const el = document.getElementById(contentId); 
+  if (!el) return; 
+  
+  el.classList.toggle("hidden"); 
+  const icon = btn.querySelector("i"); 
+  const text = btn.querySelector("span"); 
+  
+  if (el.classList.contains("hidden")) { 
+    icon.className = "fas fa-plus-square mr-1"; 
+    text.textContent = "Show"; 
+  } else { 
+    icon.className = "fas fa-minus-square mr-1"; 
+    text.textContent = "Hide"; 
+  } 
+}
 
-  const icon = btn.querySelector("i");
-  const text = btn.querySelector("span");
+// ============================== 
+// Filter Sasaran Mutu 
+// ============================== 
+let currentSarmutMode = "ALL"; 
+let userRole = window.USER_ROLE || "staff";
 
-  if (el.classList.contains("hidden")) {
-    icon.className = "fas fa-plus-square mr-1";
-    text.textContent = "Show";
-  } else {
-    icon.className = "fas fa-minus-square mr-1";
-    text.textContent = "Hide";
+function filterSasaranMutu(mode = currentSarmutMode) { 
+  if (!sasaranMutuSummaryDataMaster.length) return; 
+  
+  currentSarmutMode = mode; 
+  const dept = document.getElementById("filterDeptSarmut")?.value || "ALL"; 
+  
+  let filtered = sasaranMutuSummaryDataMaster.filter(row => { 
+    const kategori = (row["KATEGORI"] || "").toUpperCase().trim(); 
+    return ["% ACH", "ACH", "TARGET"].includes(kategori); 
+  }); 
+  
+  if (dept && dept !== "ALL") { 
+    filtered = filtered.filter(
+      row => (row["DEPT"] || "").toLowerCase().trim() === dept.toLowerCase().trim() 
+    ); 
+  } 
+  
+  const parsePercent = (val) => { 
+    if (!val) return 0; 
+    const num = parseFloat(String(val).replace("%", "").replace(",", ".").trim()); 
+    return isNaN(num) ? 0 : num; 
+  }; 
+  
+  const achRows = filtered.filter(r => (r["KATEGORI"] || "").toUpperCase() === "% ACH"); 
+  const achievedKeys = new Set(); 
+  
+  achRows.forEach(row => { 
+    const months = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"]; 
+    const nilai = months.map(k => parsePercent(row[k])).filter(v => v > 0); 
+    const isAchieved = nilai.length > 0 && nilai.every(v => v === 100); 
+    if (isAchieved) achievedKeys.add(row["SASARAN MUTU"]); 
+  }); 
+  
+  if (mode === "ACHIEVED") { 
+    filtered = filtered.filter(r => achievedKeys.has(r["SASARAN MUTU"])); 
+  } else if (mode === "NOT_ACHIEVED") { 
+    filtered = filtered.filter(r => !achievedKeys.has(r["SASARAN MUTU"])); 
+  } 
+  
+  const total = achRows.length; 
+  const achieved = [...achievedKeys].length; 
+  const notAchieved = total - achieved; 
+  
+  const totalEl = document.getElementById("sarmutTotal");
+  const achievedEl = document.getElementById("sarmutAchieved");
+  const notAchievedEl = document.getElementById("sarmutNotAchieved");
+  
+  if (totalEl) totalEl.textContent = total; 
+  if (achievedEl) achievedEl.textContent = achieved; 
+  if (notAchievedEl) notAchievedEl.textContent = notAchieved; 
+  
+  renderSasaranMutuSummaryTable(filtered); 
+}
+
+function filterSarmutIndikator(mode = currentSarmutMode) { 
+  const dept = document.getElementById("filterDeptSarmut")?.value || "ALL"; 
+  let dataFiltered = sasaranMutuDataMaster; 
+  
+  if (dept && dept !== "ALL") { 
+    dataFiltered = dataFiltered.filter(row => { 
+      const deptName = row["Dept"] || row["DEPT"] || row["Department"] || ""; 
+      return deptName.toLowerCase().trim() === dept.toLowerCase().trim(); 
+    }); 
+  } 
+  
+  if (typeof renderSasaranMutuIndikatorTable === "function") {
+    renderSasaranMutuIndikatorTable(dataFiltered); 
   }
 }
 
-// ==============================
-// Filter Sasaran Mutu
-// ==============================
-let currentSarmutMode = "ALL";
-let userRole = window.USER_ROLE || "staff"; // ⭐ pastikan server me-render role user ke JS
-
-function filterSasaranMutu(mode = currentSarmutMode) {
-  // Fokus: filter summary indikator (sarmutindikator)
-  if (!sasaranMutuSummaryDataMaster.length) return;
-
-  currentSarmutMode = mode;
-  const dept = document.getElementById("filterDeptSarmut").value;
-  // const bulan = document.getElementById("filterBulan")?.value; // opsional
-
-  // Step 1: Ambil hanya baris % ACH
-  let summaryFiltered = sasaranMutuSummaryDataMaster.filter(
-    row => (row["KATEGORI"] || "").trim().toUpperCase() === "% ACH"
-  );
-
-  // Step 2: Filter Department (jika dipilih)
-  if (dept && dept !== "ALL") {
-    summaryFiltered = summaryFiltered.filter(
-      row =>
-        (row["DEPT"] || "").toLowerCase().trim() === dept.toLowerCase().trim()
-    );
-  }
-
-  // Step 3: Helper parsing angka persen
-  const parsePercent = (val) => {
-    if (!val) return 0;
-    const num = parseFloat(String(val).replace("%", "").replace(",", ".").trim());
-    return isNaN(num) ? 0 : num;
-  };
-
-  // Step 4: Hitung status Achieved / Not Achieved
-  summaryFiltered = summaryFiltered.map(row => {
-    const bulanKeys = [
-      "JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"
-    ];
-    // Ambil semua nilai bulan yg ada
-    const nilaiBulan = bulanKeys
-      .map(k => parsePercent(row[k]))
-      .filter(v => v > 0); // hanya ambil yang terisi
-
-    // Kalau ada satu aja <100 → Not Achieved
-    const achieved = nilaiBulan.length > 0 && nilaiBulan.every(v => v === 100);
-    return { ...row, isAchieved: achieved };
-  });
-
-  // Step 5: Filter mode (Achieved / Not Achieved)
-  if (mode === "ACHIEVED") {
-    summaryFiltered = summaryFiltered.filter(r => r.isAchieved);
-  } else if (mode === "NOT_ACHIEVED") {
-    summaryFiltered = summaryFiltered.filter(r => !r.isAchieved);
-  }
-
-  // Step 6: Hitung total summary
-  const total = summaryFiltered.length;
-  const achieved = summaryFiltered.filter(r => r.isAchieved).length;
-  const notAchieved = total - achieved;
-
-  // Step 7: Update summary angka di UI
-  document.getElementById("sarmutTotal").textContent = total;
-  document.getElementById("sarmutAchieved").textContent = achieved;
-  document.getElementById("sarmutNotAchieved").textContent = notAchieved;
-
-  // Step 8: Render tabel summary indikator (hasil filter)
-  renderSasaranMutuSummaryTable(summaryFiltered);
-}
-
-// ==============================
-// Populate Dropdown Departemen
-// ==============================
-function populateDeptSarmutFilter() {
-  const select = document.getElementById("filterDeptSarmut");
-  if (!select) return;
-
-  const uniqueDepts = [...new Set(sasaranMutuDataMaster.map(row => row["Department"]).filter(Boolean))];
-
+function populateDeptSarmutFilter() { 
+  const select = document.getElementById("filterDeptSarmut"); 
+  if (!select) return; 
+  
+  const uniqueDepts = [...new Set( 
+    sasaranMutuDataMaster.map(row => row["Department"]).filter(Boolean) 
+  )]; 
+  
   select.innerHTML = `
-    <option value="ALL">Semua Departemen</option>
+    <option value="ALL">Semua Departemen</option> 
     ${uniqueDepts.map(d => `<option value="${d}">${d}</option>`).join("")}
-  `;
-
-  // 🔹 filter ulang ketika dropdown berubah
-  select.onchange = () => filterSasaranMutu(currentSarmutMode);
+  `; 
 }
 
-window.addEventListener("DOMContentLoaded", async () => {
-  await fetchSasaranMutuSummary();
+// ============================== 
+// Init - Load pertama kali
+// ============================== 
+window.addEventListener("DOMContentLoaded", async () => { 
+  console.log("🚀 Initializing Sasaran Mutu...");
+  
+  await fetchSasaranMutuSummary(); 
+  populateDeptSarmutFilter();
+  
+  // ⭐ Hide chart by default (hanya tampil jika MKT dipilih)
+  const dept = document.getElementById("filterDeptSarmut")?.value || "ALL";
+  if (dept.toUpperCase() === "MKT") {
+    fetchChartSarmut(dept);
+  } else {
+    hideChartSarmut();
+  }
 });
 
+// ============================== 
+// CHART SARMUT - Hanya untuk MKT
+// ============================== 
 let chartSarmutLine = null;
 let chartSarmutPercent = null;
 let sarmutData = [];
@@ -1289,53 +1338,61 @@ function formatRupiah(num) {
   return "Rp." + num.toLocaleString("id-ID");
 }
 
-async function fetchChartSarmut() {
+// ⭐ FUNGSI UTAMA: Fetch & Render Chart (hanya untuk MKT)
+async function fetchChartSarmut(department = "ALL") {
   try {
+    // ⭐ CRITICAL: Jangan fetch jika bukan MKT
+    if (department.toUpperCase() !== "MKT") {
+      console.log("⚠️ Chart Sarmut hanya untuk dept MKT, current dept:", department);
+      hideChartSarmut();
+      return;
+    }
+
     const res = await fetch("/api/chartsarmut", { credentials: "include" });
     sarmutData = await res.json();
 
     console.log("✅ chartsarmut data:", sarmutData);
-    console.log("✅ chartsarmut data sample:", sarmutData[0]); // Debug first row
+    console.log("✅ chartsarmut data sample:", sarmutData[0]);
 
-    // Cek element HTML ada atau tidak - sesuaikan dengan HTML yang benar
     const container = document.getElementById("sarmutCharts");
     if (!container) {
       console.error("❌ Element sarmutCharts tidak ditemukan di HTML!");
       return;
     }
 
-    // Cek apakah ada data (khusus untuk MKT)
-    if (!sarmutData.length) {
-      console.log("⚠️ Tidak ada data chart sarmut - mungkin bukan department MKT");
-      container.classList.add("hidden");
+    // Filter data hanya untuk MKT
+    const mktData = sarmutData.filter(r => {
+      const rDept = normalizeKey(r["DEPT"] || r["Dept"] || r["DEPARTMENT"] || r["Department"] || "");
+      return rDept === "mkt";
+    });
+
+    if (mktData.length === 0) {
+      console.log("⚠️ Tidak ada data untuk dept MKT");
+      hideChartSarmut();
       return;
     }
 
-    // Debug: cek struktur kolom
-    console.log("🔍 Available columns:", Object.keys(sarmutData[0] || {}));
+    console.log("🔍 Available columns:", Object.keys(mktData[0] || {}));
 
-    // 🔹 Ambil semua nama produk unik - perbaiki nama kolom
+    // 🔹 Ambil semua nama produk unik untuk MKT
     const produkList = [
       ...new Set(
-        sarmutData.map(r => {
-          // Debug setiap baris
+        mktData.map(r => {
           const produk = r["Nama Produk"] || r["NAMA PRODUK"] || r["nama produk"] || r["Produk"] || r["PRODUCT"] || r["Product"] || "";
-          if (produk) console.log("Found product:", produk);
           return produk;
         }).filter(Boolean)
       )
     ];
 
-    console.log("📦 Produk list:", produkList);
+    console.log("📦 Produk list (MKT):", produkList);
 
     if (produkList.length === 0) {
-      console.warn("⚠️ Tidak ada produk ditemukan");
-      console.warn("⚠️ Sample data struktur:", sarmutData.slice(0, 3));
-      container.classList.add("hidden");
+      console.warn("⚠️ Tidak ada produk ditemukan untuk MKT");
+      hideChartSarmut();
       return;
     }
 
-    // Show container - gunakan classList.remove untuk Tailwind
+    // ⭐ Show container
     container.classList.remove("hidden");
 
     const select = document.getElementById("produkSelect");
@@ -1347,36 +1404,60 @@ async function fetchChartSarmut() {
     select.innerHTML = produkList.map(p => `<option value="${p}">${p}</option>`).join("");
 
     // Default: render produk pertama
-    renderChart(produkList[0]);
+    renderChart(produkList[0], "MKT");
 
     // Event listener ganti produk
-    select.addEventListener("change", e => {
-      renderChart(e.target.value);
-    });
+    select.removeEventListener("change", handleProdukChange); // Hapus listener lama
+    select.addEventListener("change", handleProdukChange);
 
   } catch (err) {
     console.error("❌ Error fetchChartSarmut:", err);
-    const container = document.getElementById("sarmutCharts");
-    if (container) {
-      container.classList.add("hidden");
-    }
+    hideChartSarmut();
+  }
+}
+
+// ⭐ Handler untuk perubahan produk
+function handleProdukChange(e) {
+  const dept = document.getElementById("filterDeptSarmut")?.value || "MKT";
+  renderChart(e.target.value, dept);
+}
+
+// ⭐ HIDE CHART - dipanggil ketika bukan MKT
+function hideChartSarmut() {
+  const container = document.getElementById("sarmutCharts");
+  if (container) {
+    container.classList.add("hidden");
+  }
+  
+  // Destroy charts untuk free memory
+  if (chartSarmutLine) {
+    chartSarmutLine.destroy();
+    chartSarmutLine = null;
+  }
+  if (chartSarmutPercent) {
+    chartSarmutPercent.destroy();
+    chartSarmutPercent = null;
   }
 }
 
 // 🔹 formatter rupiah
 const rupiahFmt = val => "Rp." + val.toLocaleString("id-ID");
 
-function renderChart(produk, department = "ALL") {
-  console.log("🎯 Rendering chart for produk:", produk);
+function renderChart(produk, department = "MKT") {
+  console.log("🎯 Rendering chart for produk:", produk, "dept:", department);
   
-  // filter data sesuai dept dulu - perbaiki nama kolom
-  let dataFiltered = [...sarmutData];
-  if (department !== "ALL") {
-    dataFiltered = dataFiltered.filter(r => {
-      const rDept = normalizeKey(r["DEPT"] || r["Dept"] || r["DEPARTMENT"] || r["Department"] || r["Departemen"]);
-      return rDept === normalizeKey(department);
-    });
+  // ⭐ SAFETY CHECK: Jangan render jika bukan MKT
+  if (department.toUpperCase() !== "MKT") {
+    console.log("⚠️ Tidak render chart karena bukan dept MKT");
+    hideChartSarmut();
+    return;
   }
+
+  // Filter data sesuai dept MKT
+  let dataFiltered = sarmutData.filter(r => {
+    const rDept = normalizeKey(r["DEPT"] || r["Dept"] || r["DEPARTMENT"] || r["Department"] || "");
+    return rDept === "mkt";
+  });
 
   console.log("🔍 Data filtered length:", dataFiltered.length);
 
@@ -1401,7 +1482,6 @@ function renderChart(produk, department = "ALL") {
     return;
   }
 
-  // Ambil baris pertama untuk setiap kategori (asumsi hanya ada satu sasaran per produk)
   const rowAch = achData[0];
   const rowTarget = targetData[0];
 
@@ -1412,13 +1492,11 @@ function renderChart(produk, department = "ALL") {
 
   const ach = months.map(m => {
     const val = parseNumber(rowAch?.[m]);
-    console.log(`ACH ${m}:`, rowAch?.[m], "->", val);
     return val;
   });
   
   const target = months.map(m => {
     const val = parseNumber(rowTarget?.[m]);
-    console.log(`TARGET ${m}:`, rowTarget?.[m], "->", val);
     return val;
   });
   
@@ -1488,7 +1566,7 @@ function renderChart(produk, department = "ALL") {
           }
         },
         datalabels: {
-          display: false  // Hilangkan permanent labels
+          display: false
         }
       },
       scales: {
@@ -1505,7 +1583,7 @@ function renderChart(produk, department = "ALL") {
     }
   });
 
-  // 🔹 Bar Chart (% Ach) dengan batas 100%
+  // 🔹 Bar Chart (% Ach)
   const ctx2 = document.getElementById("chartSarmutPercent");
   if (!ctx2) {
     console.error("❌ Canvas chartSarmutPercent tidak ditemukan!");
@@ -1565,9 +1643,6 @@ function renderChart(produk, department = "ALL") {
     }
   });
 }
-
-// Auto fetch saat load
-fetchChartSarmut();
 
 let sarmutIndikatorData = [];
 let chartIndikatorLine = null;
@@ -3266,8 +3341,8 @@ window.filterMandiriByDepartment = filterMandiriByDepartment;
     loadDashboard(document.getElementById('departmentFilter').value||'ALL', document.getElementById('monthFilter').value||'ALL', e.target.value||'ALL')
   );
 
-  // Init
-  fetchSasaranMutu();
+  // Initialize
+  populateFilters();
   fetchProjectKolaborasi();
   fetchProjectMandiri();
   window.loadDashboard = loadDashboard;
