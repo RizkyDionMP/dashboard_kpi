@@ -1137,7 +1137,8 @@ function renderSasaranMutuSummaryTable(data) {
         ${idx === 0 ? `<td class="border border-gray-400 px-3 py-2 text-center align-middle" rowspan="${rowspan}">${no++}</td>` : ""} 
         ${idx === 0 ? `<td class="border border-gray-400 px-3 py-2 font-bold text-center align-middle" rowspan="${rowspan}">${sasaran}</td>` : ""} 
         ${idx === 0 ? `<td class="border border-gray-400 px-3 py-2 text-center align-middle" rowspan="${rowspan}">${row["DEPT"] || "-"}</td>` : ""} 
-        ${idx === 0 ? `<td class="border border-gray-400 px-3 py-2 text-center align-middle" rowspan="${rowspan}">${row["PERIODE EVALUASI"] || "-"}</td>` : ""} 
+        ${idx === 0 ? `<td class="border border-gray-400 px-3 py-2 text-center align-middle" rowspan="${rowspan}">${row["PERIODE EVALUASI"] || "-"}</td>` : ""}
+        <td class="border border-gray-400 px-3 py-2 text-center">${row["NAMA PRODUK"] || "-"}</td> 
         <td class="border border-gray-400 px-3 py-2 text-center">${row["KATEGORI"] || "-"}</td> 
         <td class="border border-gray-400 px-3 py-2 text-center">${row["JAN"] || "-"}</td> 
         <td class="border border-gray-400 px-3 py-2 text-center">${row["FEB"] || "-"}</td> 
@@ -1247,7 +1248,8 @@ function filterSasaranMutu(mode = currentSarmutMode) {
     filtered = filtered.filter(r => !achievedKeys.has(r["SASARAN MUTU"])); 
   } 
   
-  const total = achRows.length; 
+  const uniqueSasaranMutu = new Set(achRows.map(r => r["SASARAN MUTU"]));
+  const total = uniqueSasaranMutu.size; 
   const achieved = [...achievedKeys].length; 
   const notAchieved = total - achieved; 
   
