@@ -933,9 +933,17 @@ function renderAvgDeptBarChart(labels, values) {
       }]
     },
     options: {
-      responsive: true,              // ✅ Ubah ke true
-      maintainAspectRatio: true,     // ✅ Tambahkan ini
-      aspectRatio: 2,                // ✅ Rasio 2:1
+      responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 2.5,              // ✅ Ubah dari 2 ke 2.5 (lebih lebar, tidak terlalu tinggi)
+      layout: {
+        padding: {
+          top: 30,                   // ✅ Tambah padding atas agar label tidak terpotong
+          bottom: 10,
+          left: 10,
+          right: 10
+        }
+      },
       onClick: (evt, elements) => {
         if (elements.length > 0) {
           const idx = elements[0].index;
@@ -959,17 +967,19 @@ function renderAvgDeptBarChart(labels, values) {
           align: 'end',
           color: '#000000',
           font: { weight: 'bold', size: 14 },
-          formatter: value => value.toFixed(2)
+          formatter: value => value.toFixed(2),
+          offset: 4              // ✅ Tambah offset agar tidak menempel di bar
         }
       },
       scales: {
         y: {
           beginAtZero: true,
+          suggestedMax: Math.max(...values) * 1.15,  // ✅ Tambah 15% ruang di atas
           ticks: { 
             color: 'black', 
             font: { weight: 'bold', size: 12 }
           },
-          grid: { color: '#ffffffff' }
+          grid: { color: '#e5e7eb' }  // ✅ Ubah dari transparent ke abu-abu muda
         },
         x: {
           ticks: { 
